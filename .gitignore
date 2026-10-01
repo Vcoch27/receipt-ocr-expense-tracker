@@ -32,6 +32,8 @@ migrate_working_dir/
 .pub/
 /build/
 /android/build/
+/.agents/skills/*
+!/.agents/skills/receipt-ocr-expense-tracker/
 /coverage/
 /android/key.properties
 *.jks
