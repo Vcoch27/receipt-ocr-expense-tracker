@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../core/formatters.dart';
+import '../l10n/l10n.dart';
 
 class WeeklyBarChart extends StatefulWidget {
   const WeeklyBarChart({super.key, required this.values});
@@ -49,10 +50,18 @@ class _WeeklyBarChartState extends State<WeeklyBarChart>
 
   @override
   Widget build(BuildContext context) {
-    const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    final labels = [
+      context.l10n.mon,
+      context.l10n.tue,
+      context.l10n.wed,
+      context.l10n.thu,
+      context.l10n.fri,
+      context.l10n.sat,
+      context.l10n.sun,
+    ];
     final total = widget.values.fold<int>(0, (a, b) => a + b);
     return Semantics(
-      label: 'This week spending ${formatVnd(total)}',
+      label: context.l10n.weekChartSemantics(formatVnd(total)),
       child: Column(
         children: [
           SizedBox(

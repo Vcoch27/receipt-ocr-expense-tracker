@@ -32,6 +32,7 @@ migrate_working_dir/
 .pub/
 /build/
 /android/build/
+/android/.kotlin/
 /.agents/skills/*
 !/.agents/skills/receipt-ocr-expense-tracker/
 /coverage/

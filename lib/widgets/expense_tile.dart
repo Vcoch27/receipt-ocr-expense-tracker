@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/categories.dart';
 import '../core/formatters.dart';
+import '../l10n/expense_labels.dart';
 import '../models/expense_item.dart';
 
 class ExpenseTile extends StatelessWidget {
@@ -28,7 +29,9 @@ class ExpenseTile extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        subtitle: Text('${formatDate(item.date)} · ${item.source.label}'),
+        subtitle: Text(
+          '${formatDate(item.date)} · ${localizedSource(context, item.source)}',
+        ),
         trailing: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -39,7 +42,10 @@ class ExpenseTile extends StatelessWidget {
                   ?.copyWith(fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 2),
-            Text(item.category, style: Theme.of(context).textTheme.bodySmall),
+            Text(
+              localizedCategory(context, item.category),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
           ],
         ),
       ),
