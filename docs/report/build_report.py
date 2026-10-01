@@ -246,9 +246,10 @@ def main():
     # Page 3 - screenshots and demo evidence
     story.append(p("Material 3 interface", TITLE))
     story.append(p(
-        "Screenshots below were captured from the Android build before the "
-        "Vietnamese labels and launcher icon were added. The same navigation "
-        "and review hierarchy remains in the current release."
+        "These screenshots show the signed Android release on a physical "
+        "Samsung phone. The Vietnamese interface, original receipt mark, "
+        "light theme, and dark theme are visible. The empty state reflects "
+        "a fresh local database; private payment images are omitted."
     ))
     shot_table = Table([[
         image_fit(LIGHT, 218, 432),

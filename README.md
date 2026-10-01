@@ -125,7 +125,8 @@ stable keys, so switching languages does not rewrite expense records.
 
 The integration test replaces the picker and native ML Kit boundary with
 deterministic text fixtures; it exercises real parsers, review, state, history,
-and analytics. The signed release was also tested on a Samsung SM-A115F with
+and analytics. It passed on a Samsung SM-A115F on 1 October 2026. The signed
+release was also tested on that device with
 three real payment-success images: native ML Kit reached review and extracted
 amount, date/time, status, recipient and transfer note. These private images
 and OCR text are not included in the repository. A paper receipt camera test
@@ -144,11 +145,12 @@ adb install -r on a physical Android device. Never commit signing credentials.
 
 ## Screenshots and demo
 
-The [light home](docs/screenshots/light-home.png),
-[dark home](docs/screenshots/dark-home.png),
-[review](docs/screenshots/dark-review.png), and
-[analytics](docs/screenshots/dark-weekly.png) screenshots were captured on an
-Android device before the bilingual labels and new icon were added. The
+The [light home](docs/screenshots/light-home.png) and
+[dark home](docs/screenshots/dark-home.png) screenshots show the Vietnamese
+release with the new brand mark on the Samsung device. The
+[review](docs/screenshots/dark-review.png) and
+[analytics](docs/screenshots/dark-weekly.png) screenshots show the same flows
+from an earlier English build. The
 [technical report](output/pdf/smart_expense_technical_report.pdf)
 contains the architecture diagram, heuristic table, and light/dark screenshots.
 Use [docs/demo-flow.md](docs/demo-flow.md) to record the live receipt scan and
