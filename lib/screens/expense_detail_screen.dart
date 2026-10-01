@@ -1,0 +1,196 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+
+import '../core/formatters.dart';
+import '../models/expense_item.dart';
+import '../models/expense_source.dart';
+import '../routing/app_router.dart';
+import '../state/expense_providers.dart';
+import '../widgets/expense_state.dart';
+import '../widgets/page_container.dart';
+
+class ExpenseDetailScreen extends ConsumerWidget {
+  const ExpenseDetailScreen({super.key, required this.id});
+  final int id;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final expenses = ref.watch(expensesProvider);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Expense details')),
+      body: PageContainer(
+        child: expenses.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, _) => ExpenseState(
+            icon: Icons.error_outline,
+            title: 'Could not load expense',
+            message: error.toString(),
+          ),
+          data: (items) {
+            ExpenseItem? item;
+            for (final candidate in items) {
+              if (candidate.id == id) {
+                item = candidate;
+                break;
+              }
+            }
+            if (item == null) {
+              return const ExpenseState(
+                icon: Icons.search_off_outlined,
+                title: 'Expense not found',
+                message: 'It may have been deleted.',
+              );
+            }
+            return _Detail(item: item);
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _Detail extends ConsumerWidget {
+  const _Detail({required this.item});
+  final ExpenseItem item;
+
+  Future<void> _delete(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Delete expense?'),
+        content: const Text(
+          'This record and its stored image will be removed.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    try {
+      await ref.read(expensesProvider.notifier).deleteExpense(item);
+      if (context.mounted) context.go('/expenses');
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Delete failed: $error')));
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final isPayment =
+        item.source == ExpenseSource.bankScreenshot ||
+        item.source == ExpenseSource.eWalletScreenshot;
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        Text(item.merchant, style: theme.textTheme.headlineSmall),
+        const SizedBox(height: 8),
+        Text(
+          formatVnd(item.amount),
+          style: theme.textTheme.headlineMedium?.copyWith(
+            color: theme.colorScheme.primary,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 20),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                _DetailRow(label: 'Date', value: formatDate(item.date)),
+                _DetailRow(label: 'Source', value: item.source.label),
+                _DetailRow(label: 'Category', value: item.category),
+                if (isPayment && item.date.hour + item.date.minute > 0)
+                  _DetailRow(
+                    label: 'Time',
+                    value:
+                        '${item.date.hour.toString().padLeft(2, '0')}:${item.date.minute.toString().padLeft(2, '0')}',
+                  ),
+                if (item.paymentProvider?.isNotEmpty == true)
+                  _DetailRow(label: 'Provider', value: item.paymentProvider!),
+                if (item.transactionReference?.isNotEmpty == true)
+                  _DetailRow(
+                    label: 'Reference',
+                    value: item.transactionReference!,
+                  ),
+                if (item.note?.isNotEmpty == true)
+                  _DetailRow(label: 'Note', value: item.note!),
+              ],
+            ),
+          ),
+        ),
+        if (item.imagePath != null) ...[
+          const SizedBox(height: 20),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.file(
+              File(item.imagePath!),
+              height: 240,
+              fit: BoxFit.contain,
+              errorBuilder: (_, _, _) => const ExpenseState(
+                icon: Icons.broken_image_outlined,
+                title: 'Image unavailable',
+                message: 'The saved text record is still usable.',
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 24),
+        FilledButton.icon(
+          onPressed: () =>
+              context.push('/review', extra: ReviewArgs(existing: item)),
+          icon: const Icon(Icons.edit_outlined),
+          label: const Text('Edit expense'),
+        ),
+        const SizedBox(height: 8),
+        TextButton.icon(
+          onPressed: () => _delete(context, ref),
+          icon: const Icon(Icons.delete_outline),
+          label: const Text('Delete expense'),
+        ),
+      ],
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  const _DetailRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: Theme.of(context).textTheme.bodyMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+        ),
+      ],
+    ),
+  );
+}
