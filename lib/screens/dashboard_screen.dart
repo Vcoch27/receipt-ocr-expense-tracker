@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/formatters.dart';
+import '../l10n/l10n.dart';
 import '../main.dart';
 import '../models/expense_item.dart';
 import '../state/expense_providers.dart';
@@ -18,20 +19,55 @@ class DashboardScreen extends ConsumerWidget {
     final expenses = ref.watch(expensesProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Smart Expense'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset('assets/brand/receipt-mark.png', width: 30, height: 30),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                context.l10n.appName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
         actions: [
+          PopupMenuButton<Locale>(
+            tooltip: context.l10n.language,
+            icon: const Icon(Icons.language_outlined),
+            onSelected: (locale) =>
+                ref.read(localeProvider.notifier).state = locale,
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                value: const Locale('vi'),
+                child: Text(context.l10n.vietnamese),
+              ),
+              PopupMenuItem(
+                value: const Locale('en'),
+                child: Text(context.l10n.english),
+              ),
+            ],
+          ),
           PopupMenuButton<ThemeMode>(
-            tooltip: 'Appearance',
+            tooltip: context.l10n.appearance,
             icon: const Icon(Icons.brightness_6_outlined),
             onSelected: (mode) =>
                 ref.read(themeModeProvider.notifier).state = mode,
-            itemBuilder: (_) => const [
+            itemBuilder: (_) => [
               PopupMenuItem(
                 value: ThemeMode.system,
-                child: Text('System theme'),
+                child: Text(context.l10n.systemTheme),
               ),
-              PopupMenuItem(value: ThemeMode.light, child: Text('Light mode')),
-              PopupMenuItem(value: ThemeMode.dark, child: Text('Dark mode')),
+              PopupMenuItem(
+                value: ThemeMode.light,
+                child: Text(context.l10n.lightMode),
+              ),
+              PopupMenuItem(
+                value: ThemeMode.dark,
+                child: Text(context.l10n.darkMode),
+              ),
             ],
           ),
         ],
@@ -39,13 +75,13 @@ class DashboardScreen extends ConsumerWidget {
       body: PageContainer(
         child: expenses.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => ExpenseState(
+          error: (_, _) => ExpenseState(
             icon: Icons.cloud_off_outlined,
-            title: 'Could not load expenses',
-            message: error.toString(),
+            title: context.l10n.couldNotLoadExpenses,
+            message: context.l10n.retryHint,
             action: FilledButton(
               onPressed: () => ref.invalidate(expensesProvider),
-              child: const Text('Try again'),
+              child: Text(context.l10n.tryAgain),
             ),
           ),
           data: (items) => _DashboardContent(items: items),
@@ -71,16 +107,13 @@ class _DashboardContent extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       children: [
         Text(
-          'Capture what you spend',
+          context.l10n.captureHeadline,
           style: theme.textTheme.headlineMedium?.copyWith(
             fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 6),
-        Text(
-          'Save bank payments, wallet screenshots, and paper receipts in one place.',
-          style: theme.textTheme.bodyMedium,
-        ),
+        Text(context.l10n.captureSubtitle, style: theme.textTheme.bodyMedium),
         const SizedBox(height: 24),
         Card(
           color: theme.colorScheme.primaryContainer,
@@ -89,7 +122,10 @@ class _DashboardContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Spent this month', style: theme.textTheme.titleMedium),
+                Text(
+                  context.l10n.spentThisMonth,
+                  style: theme.textTheme.titleMedium,
+                ),
                 const SizedBox(height: 10),
                 Text(
                   formatVnd(total),
@@ -101,8 +137,8 @@ class _DashboardContent extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(
                   items.isEmpty
-                      ? 'Your first expense starts below'
-                      : '${monthly.length} expense records',
+                      ? context.l10n.firstExpenseHint
+                      : context.l10n.expenseRecords(monthly.length),
                   style: theme.textTheme.bodySmall,
                 ),
               ],
@@ -114,26 +150,33 @@ class _DashboardContent extends StatelessWidget {
           key: const ValueKey('add_expense'),
           onPressed: () => context.push('/scan'),
           icon: const Icon(Icons.add_photo_alternate_outlined),
-          label: const Text('Add expense'),
+          label: Text(context.l10n.addExpense),
         ),
         const SizedBox(height: 24),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Recent activity', style: theme.textTheme.titleLarge),
+            Expanded(
+              child: Text(
+                context.l10n.recentActivity,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleLarge,
+              ),
+            ),
             if (items.isNotEmpty)
               TextButton(
                 onPressed: () => context.go('/expenses'),
-                child: const Text('View all'),
+                child: Text(context.l10n.viewAll),
               ),
           ],
         ),
         const SizedBox(height: 8),
         if (items.isEmpty)
-          const ExpenseState(
+          ExpenseState(
             icon: Icons.account_balance_wallet_outlined,
-            title: 'No expenses yet',
-            message: 'Import a payment screenshot, scan a receipt, or enter an expense manually.',
+            title: context.l10n.noExpensesYet,
+            message: context.l10n.emptyExpenseHint,
           )
         else
           ...items

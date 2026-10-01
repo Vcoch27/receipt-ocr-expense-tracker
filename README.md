@@ -21,7 +21,10 @@ screenshot extension. The receipt path remains fully available.
 - Local SQLite CRUD, persistent image copies, reactive Riverpod 2 history,
   and custom animated category donut and weekly bar charts.
 - Material 3, light/dark/system appearance, responsive layout, and empty,
-  loading, and error states.
+  loading, and error states. Vietnamese is the default interface language;
+  the language control on the home app bar switches to English.
+- An original receipt/check mark is used in the app bar and Android/iOS
+  launcher icons; the source PNG is in [assets/brand](assets/brand).
 
 ## Architecture
 
@@ -110,6 +113,8 @@ and day of the current week.
 
 The Android application ID is vn.vku.smart_expense_capture; minimum Android
 SDK is 24 (Flutter 3.47 default). The core flow works without a network connection.
+UI strings use Flutter ARB resources in `lib/l10n`; saved categories retain
+stable keys, so switching languages does not rewrite expense records.
 
 ## Tests and analysis
 
@@ -120,7 +125,8 @@ SDK is 24 (Flutter 3.47 default). The core flow works without a network connecti
 
 The integration test replaces the picker and native ML Kit boundary with
 deterministic text fixtures; it exercises real parsers, review, state, history,
-and analytics. The signed release was also tested on a Samsung SM-A115F with
+and analytics. It passed on a Samsung SM-A115F on 1 October 2026. The signed
+release was also tested on that device with
 three real payment-success images: native ML Kit reached review and extracted
 amount, date/time, status, recipient and transfer note. These private images
 and OCR text are not included in the repository. A paper receipt camera test
@@ -139,11 +145,13 @@ adb install -r on a physical Android device. Never commit signing credentials.
 
 ## Screenshots and demo
 
-The [light home](docs/screenshots/light-home.png),
-[dark home](docs/screenshots/dark-home.png),
-[review](docs/screenshots/dark-review.png), and
-[analytics](docs/screenshots/dark-weekly.png) screenshots were captured on an
-Android device. The [technical report](output/pdf/smart_expense_technical_report.pdf)
+The [light home](docs/screenshots/light-home.png) and
+[dark home](docs/screenshots/dark-home.png) screenshots show the Vietnamese
+release with the new brand mark on the Samsung device. The
+[review](docs/screenshots/dark-review.png) and
+[analytics](docs/screenshots/dark-weekly.png) screenshots show the same flows
+from an earlier English build. The
+[technical report](output/pdf/smart_expense_technical_report.pdf)
 contains the architecture diagram, heuristic table, and light/dark screenshots.
 Use [docs/demo-flow.md](docs/demo-flow.md) to record the live receipt scan and
 payment screenshot demonstration. A demo video is not bundled.
@@ -161,3 +169,5 @@ payment screenshot demonstration. A demo video is not bundled.
   still needs validation with an actual paper receipt.
 - iOS requires a Mac/Xcode build and a compatible device; it has not been
   validated on iPhone from this Windows workspace.
+- The selected interface language currently resets to Vietnamese when the
+  app process restarts.

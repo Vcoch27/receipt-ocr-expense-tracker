@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_expense_capture/models/expense_item.dart';
+import 'package:smart_expense_capture/l10n/app_localizations.dart';
 import 'package:smart_expense_capture/models/expense_source.dart';
 import 'package:smart_expense_capture/models/parsed_expense.dart';
 import 'package:smart_expense_capture/routing/app_router.dart';
@@ -36,8 +37,9 @@ class _MemoryRepository implements ExpenseRepository {
 Future<void> _pumpReview(
   WidgetTester tester,
   _MemoryRepository repository,
-  ParsedExpense draft,
-) async {
+  ParsedExpense draft, {
+  Locale locale = const Locale('en'),
+}) async {
   final router = GoRouter(
     routes: [
       GoRoute(
@@ -54,7 +56,12 @@ Future<void> _pumpReview(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [expenseRepositoryProvider.overrideWithValue(repository)],
-      child: MaterialApp.router(routerConfig: router),
+      child: MaterialApp.router(
+        routerConfig: router,
+        locale: locale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+      ),
     ),
   );
   await tester.pumpAndSettle();
@@ -162,4 +169,22 @@ void main() {
     expect(find.text('Verify that this payment succeeded'), findsOneWidget);
     expect(repo.items, isEmpty);
   });
+
+  testWidgets(
+    'Vietnamese review localizes validation without changing stored values',
+    (tester) async {
+      final repo = _MemoryRepository();
+      await _pumpReview(
+        tester,
+        repo,
+        const ParsedExpense(source: ExpenseSource.receipt, rawText: ''),
+        locale: const Locale('vi'),
+      );
+      expect(find.text('Kiểm tra & xác nhận'), findsOneWidget);
+      await _tapSave(tester);
+      expect(find.text('Nhập người nhận hoặc cửa hàng'), findsOneWidget);
+      expect(find.text('Nhập số tiền lớn hơn 0'), findsOneWidget);
+      expect(repo.items, isEmpty);
+    },
+  );
 }

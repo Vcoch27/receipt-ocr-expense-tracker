@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../core/formatters.dart';
+import '../l10n/expense_labels.dart';
+import '../l10n/l10n.dart';
 import '../models/expense_item.dart';
 import '../models/expense_source.dart';
 import '../routing/app_router.dart';
@@ -20,14 +22,14 @@ class ExpenseDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final expenses = ref.watch(expensesProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Expense details')),
+      appBar: AppBar(title: Text(context.l10n.expenseDetails)),
       body: PageContainer(
         child: expenses.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, _) => ExpenseState(
+          error: (_, _) => ExpenseState(
             icon: Icons.error_outline,
-            title: 'Could not load expense',
-            message: error.toString(),
+            title: context.l10n.couldNotLoadExpense,
+            message: context.l10n.retryHint,
           ),
           data: (items) {
             ExpenseItem? item;
@@ -38,10 +40,10 @@ class ExpenseDetailScreen extends ConsumerWidget {
               }
             }
             if (item == null) {
-              return const ExpenseState(
+              return ExpenseState(
                 icon: Icons.search_off_outlined,
-                title: 'Expense not found',
-                message: 'It may have been deleted.',
+                title: context.l10n.expenseNotFound,
+                message: context.l10n.mayHaveBeenDeleted,
               );
             }
             return _Detail(item: item);
@@ -60,18 +62,16 @@ class _Detail extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Delete expense?'),
-        content: const Text(
-          'This record and its stored image will be removed.',
-        ),
+        title: Text(context.l10n.deleteExpenseQuestion),
+        content: Text(context.l10n.deleteExpenseHint),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete'),
+            child: Text(context.l10n.delete),
           ),
         ],
       ),
@@ -80,10 +80,10 @@ class _Detail extends ConsumerWidget {
     try {
       await ref.read(expensesProvider.notifier).deleteExpense(item);
       if (context.mounted) context.go('/expenses');
-    } catch (error) {
+    } catch (_) {
       if (context.mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Delete failed: $error')));
+            .showSnackBar(SnackBar(content: Text(context.l10n.deleteFailed)));
       }
     }
   }
@@ -112,24 +112,36 @@ class _Detail extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _DetailRow(label: 'Date', value: formatDate(item.date)),
-                _DetailRow(label: 'Source', value: item.source.label),
-                _DetailRow(label: 'Category', value: item.category),
+                _DetailRow(
+                  label: context.l10n.date,
+                  value: formatDate(item.date),
+                ),
+                _DetailRow(
+                  label: context.l10n.source,
+                  value: localizedSource(context, item.source),
+                ),
+                _DetailRow(
+                  label: context.l10n.category,
+                  value: localizedCategory(context, item.category),
+                ),
                 if (isPayment && item.date.hour + item.date.minute > 0)
                   _DetailRow(
-                    label: 'Time',
+                    label: context.l10n.time,
                     value:
                         '${item.date.hour.toString().padLeft(2, '0')}:${item.date.minute.toString().padLeft(2, '0')}',
                   ),
                 if (item.paymentProvider?.isNotEmpty == true)
-                  _DetailRow(label: 'Provider', value: item.paymentProvider!),
+                  _DetailRow(
+                    label: context.l10n.provider,
+                    value: item.paymentProvider!,
+                  ),
                 if (item.transactionReference?.isNotEmpty == true)
                   _DetailRow(
-                    label: 'Reference',
+                    label: context.l10n.reference,
                     value: item.transactionReference!,
                   ),
                 if (item.note?.isNotEmpty == true)
-                  _DetailRow(label: 'Note', value: item.note!),
+                  _DetailRow(label: context.l10n.note, value: item.note!),
               ],
             ),
           ),
@@ -142,10 +154,10 @@ class _Detail extends ConsumerWidget {
               File(item.imagePath!),
               height: 240,
               fit: BoxFit.contain,
-              errorBuilder: (_, _, _) => const ExpenseState(
+              errorBuilder: (_, _, _) => ExpenseState(
                 icon: Icons.broken_image_outlined,
-                title: 'Image unavailable',
-                message: 'The saved text record is still usable.',
+                title: context.l10n.imageUnavailable,
+                message: context.l10n.savedRecordUsable,
               ),
             ),
           ),
@@ -155,13 +167,13 @@ class _Detail extends ConsumerWidget {
           onPressed: () =>
               context.push('/review', extra: ReviewArgs(existing: item)),
           icon: const Icon(Icons.edit_outlined),
-          label: const Text('Edit expense'),
+          label: Text(context.l10n.editExpense),
         ),
         const SizedBox(height: 8),
         TextButton.icon(
           onPressed: () => _delete(context, ref),
           icon: const Icon(Icons.delete_outline),
-          label: const Text('Delete expense'),
+          label: Text(context.l10n.deleteExpense),
         ),
       ],
     );

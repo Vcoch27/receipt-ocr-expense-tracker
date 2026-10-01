@@ -184,7 +184,8 @@ def main():
     story.append(Spacer(1, 12))
     story.append(p(
         "Design: Material 3, a restrained blue/green palette, solid surfaces, "
-        "48 dp touch targets, light/dark themes, and a single review form "
+        "48 dp touch targets, light/dark themes, an original receipt/check "
+        "brand mark, Vietnamese-first and English UI, and one review form "
         "adapted to the input source.", SMALL,
     ))
     story.append(PageBreak())
@@ -245,8 +246,10 @@ def main():
     # Page 3 - screenshots and demo evidence
     story.append(p("Material 3 interface", TITLE))
     story.append(p(
-        "Screenshots below are captured from the Android build. The same "
-        "navigation and review hierarchy works in both appearances."
+        "These screenshots show the signed Android release on a physical "
+        "Samsung phone. The Vietnamese interface, original receipt mark, "
+        "light theme, and dark theme are visible. The empty state reflects "
+        "a fresh local database; private payment images are omitted."
     ))
     shot_table = Table([[
         image_fit(LIGHT, 218, 432),

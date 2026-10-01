@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models/parsed_expense.dart';
+import '../l10n/l10n.dart';
 import '../routing/app_router.dart';
 import '../state/expense_providers.dart';
 import '../widgets/page_container.dart';
@@ -35,16 +36,11 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
       }
     } on TimeoutException {
       if (mounted) {
-        setState(
-          () => _error = 'Recognition took too long. Try a clearer image or enter details manually.',
-        );
+        setState(() => _error = context.l10n.ocrTimeout);
       }
-    } catch (error) {
+    } catch (_) {
       if (mounted) {
-        setState(
-          () => _error =
-              'Could not read the image. Check camera or photo access and try again. $error',
-        );
+        setState(() => _error = context.l10n.ocrError);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -56,24 +52,26 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     final service = ref.read(receiptScanServiceProvider);
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Add expense')),
+      appBar: AppBar(title: Text(context.l10n.addExpense)),
       body: SafeArea(
         child: PageContainer(
           child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
-              Text('Choose a source', style: theme.textTheme.headlineSmall),
+              Text(
+                context.l10n.chooseSource,
+                style: theme.textTheme.headlineSmall,
+              ),
               const SizedBox(height: 8),
               Text(
-                'Your image stays on this device. Every OCR result is reviewed before saving.',
+                context.l10n.localPrivacyHint,
                 style: theme.textTheme.bodyMedium,
               ),
               const SizedBox(height: 24),
               _SourceCard(
                 icon: Icons.phone_android_outlined,
-                title: 'Import Payment Screenshot',
-                subtitle:
-                    'Bank transfer, MoMo, ZaloPay, VNPay, or another wallet',
+                title: context.l10n.importPaymentScreenshot,
+                subtitle: context.l10n.paymentSourceHint,
                 prominent: true,
                 onTap: _busy
                     ? null
@@ -82,8 +80,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
               const SizedBox(height: 12),
               _SourceCard(
                 icon: Icons.document_scanner_outlined,
-                title: 'Scan Receipt',
-                subtitle: 'Photograph a paper receipt with your camera',
+                title: context.l10n.scanReceipt,
+                subtitle: context.l10n.scanReceiptHint,
                 onTap: _busy
                     ? null
                     : () => _start(
@@ -93,8 +91,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
               const SizedBox(height: 12),
               _SourceCard(
                 icon: Icons.photo_library_outlined,
-                title: 'Choose Receipt Photo',
-                subtitle: 'Select a paper receipt image from your gallery',
+                title: context.l10n.chooseReceiptPhoto,
+                subtitle: context.l10n.chooseReceiptPhotoHint,
                 onTap: _busy
                     ? null
                     : () => _start(
@@ -104,8 +102,8 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
               const SizedBox(height: 12),
               _SourceCard(
                 icon: Icons.edit_note_outlined,
-                title: 'Manual Entry',
-                subtitle: 'Add an expense without an image',
+                title: context.l10n.manualEntry,
+                subtitle: context.l10n.manualEntryHint,
                 onTap: _busy
                     ? null
                     : () => context.push(
@@ -117,7 +115,7 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                 const SizedBox(height: 24),
                 const Center(child: CircularProgressIndicator()),
                 const SizedBox(height: 8),
-                const Center(child: Text('Reading image on this device…')),
+                Center(child: Text(context.l10n.readingImage)),
               ],
               if (_error != null) ...[
                 const SizedBox(height: 20),

@@ -7,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import '../core/categories.dart';
 import '../core/expense_validation.dart';
 import '../core/formatters.dart';
+import '../l10n/expense_labels.dart';
+import '../l10n/l10n.dart';
 import '../models/expense_item.dart';
 import '../models/expense_source.dart';
 import '../models/parsed_expense.dart';
@@ -132,18 +134,21 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       final saveAnyway = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Possible duplicate'),
+          title: Text(context.l10n.possibleDuplicate),
           content: Text(
-            'A similar ${duplicate.source.label.toLowerCase()} expense for ${duplicate.merchant} is already saved. Save this one too?',
+            context.l10n.duplicateMessage(
+              localizedSource(context, duplicate.source).toLowerCase(),
+              duplicate.merchant,
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Review again'),
+              child: Text(context.l10n.reviewAgain),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(dialogContext, true),
-              child: const Text('Save anyway'),
+              child: Text(context.l10n.saveAnyway),
             ),
           ],
         ),
@@ -165,13 +170,15 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            _existing == null ? 'Expense saved' : 'Expense updated',
+            _existing == null
+                ? context.l10n.expenseSaved
+                : context.l10n.expenseUpdated,
           ),
         ),
       );
-    } catch (error) {
+    } catch (_) {
       if (mounted) {
-        setState(() => _saveError = 'Could not save expense: $error');
+        setState(() => _saveError = context.l10n.couldNotSave);
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -185,7 +192,11 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
     final image = _existing?.imagePath ?? draft.imagePath;
     return Scaffold(
       appBar: AppBar(
-        title: Text(_existing == null ? 'Review & Verify' : 'Edit expense'),
+        title: Text(
+          _existing == null
+              ? context.l10n.reviewVerify
+              : context.l10n.editExpense,
+        ),
       ),
       body: SafeArea(
         child: PageContainer(
@@ -196,7 +207,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               children: [
                 Text(
-                  _source.label,
+                  localizedSource(context, _source),
                   style: theme.textTheme.labelLarge?.copyWith(
                     color: theme.colorScheme.primary,
                   ),
@@ -204,13 +215,13 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                 const SizedBox(height: 6),
                 Text(
                   _existing == null
-                      ? 'Check every detail before saving'
-                      : 'Update the saved details',
+                      ? context.l10n.reviewHeadline
+                      : context.l10n.editHeadline,
                   style: theme.textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'OCR can misread amounts and names. Correct any field that is missing or wrong.',
+                  context.l10n.reviewHint,
                   style: theme.textTheme.bodyMedium,
                 ),
                 if (image != null) ...[
@@ -221,9 +232,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                       File(image),
                       height: 180,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => const ListTile(
-                        leading: Icon(Icons.broken_image_outlined),
-                        title: Text('Image preview unavailable'),
+                      errorBuilder: (_, _, _) => ListTile(
+                        leading: const Icon(Icons.broken_image_outlined),
+                        title: Text(context.l10n.imagePreviewUnavailable),
                       ),
                     ),
                   ),
@@ -234,11 +245,9 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   const SizedBox(height: 16),
                   Card(
                     color: theme.colorScheme.tertiaryContainer,
-                    child: const Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text(
-                        'No text was recognized. Enter the details from the image manually.',
-                      ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(context.l10n.noOcrText),
                     ),
                   ),
                 ],
@@ -251,14 +260,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   onFieldSubmitted: (_) => _amountFocus.requestFocus(),
                   decoration: InputDecoration(
                     labelText: _isPayment
-                        ? 'Recipient or merchant'
-                        : 'Merchant',
+                        ? context.l10n.recipientOrMerchant
+                        : context.l10n.merchant,
                     helperText: _merchant.text.isEmpty
-                        ? 'Not detected — enter this manually'
+                        ? context.l10n.notDetected
                         : null,
                   ),
                   validator: (value) => value == null || value.trim().isEmpty
-                      ? 'Enter a merchant or recipient'
+                      ? context.l10n.merchantRequired
                       : null,
                 ),
                 const SizedBox(height: 16),
@@ -268,14 +277,14 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   focusNode: _amountFocus,
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Amount (VND)',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.amountVnd,
                     hintText: '150.000',
-                    helperText: 'Use digits or Vietnamese thousands separators',
+                    helperText: context.l10n.amountHint,
                   ),
                   validator: (value) =>
                       ExpenseValidation.amount(value ?? '') == null
-                      ? 'Enter a positive amount'
+                      ? context.l10n.amountRequired
                       : null,
                 ),
                 const SizedBox(height: 16),
@@ -284,10 +293,10 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   controller: _date,
                   keyboardType: TextInputType.datetime,
                   decoration: InputDecoration(
-                    labelText: 'Transaction date',
+                    labelText: context.l10n.transactionDate,
                     hintText: 'dd/MM/yyyy',
                     suffixIcon: IconButton(
-                      tooltip: 'Choose date',
+                      tooltip: context.l10n.chooseDate,
                       onPressed: _pickDate,
                       icon: const Icon(Icons.calendar_today_outlined),
                     ),
@@ -298,7 +307,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                             _isPayment ? _time.text : null,
                           ) ==
                           null
-                      ? 'Enter a valid date (dd/MM/yyyy)'
+                      ? context.l10n.dateRequired
                       : null,
                 ),
                 if (_isPayment) ...[
@@ -306,8 +315,8 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   TextFormField(
                     controller: _time,
                     keyboardType: TextInputType.datetime,
-                    decoration: const InputDecoration(
-                      labelText: 'Time (optional)',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.timeOptional,
                       hintText: '14:30',
                     ),
                     validator: (value) =>
@@ -315,54 +324,53 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                             value.trim().isNotEmpty &&
                             ExpenseValidation.dateTime(_date.text, value) ==
                                 null
-                        ? 'Use 24-hour time (HH:mm)'
+                        ? context.l10n.timeInvalid
                         : null,
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<PaymentStatus>(
                     initialValue: _status,
-                    decoration: const InputDecoration(
-                      labelText: 'Transaction status',
-                      helperText:
-                          'Only confirmed successful payments can be saved',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.transactionStatus,
+                      helperText: context.l10n.successfulOnly,
                     ),
                     items: PaymentStatus.values
                         .map(
                           (status) => DropdownMenuItem(
                             value: status,
-                            child: Text(status.label),
+                            child: Text(localizedStatus(context, status)),
                           ),
                         )
                         .toList(),
                     onChanged: (value) => setState(() => _status = value),
                     validator: (value) => value == PaymentStatus.successful
                         ? null
-                        : 'Verify that this payment succeeded',
+                        : context.l10n.verifySuccess,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _provider,
-                    decoration: const InputDecoration(
-                      labelText: 'Bank or wallet (optional)',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.bankWalletOptional,
                     ),
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _reference,
-                    decoration: const InputDecoration(
-                      labelText: 'Transaction reference (optional)',
+                    decoration: InputDecoration(
+                      labelText: context.l10n.referenceOptional,
                     ),
                   ),
                 ],
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   initialValue: _category,
-                  decoration: const InputDecoration(labelText: 'Category'),
+                  decoration: InputDecoration(labelText: context.l10n.category),
                   items: categories
                       .map(
                         (category) => DropdownMenuItem(
                           value: category,
-                          child: Text(category),
+                          child: Text(localizedCategory(context, category)),
                         ),
                       )
                       .toList(),
@@ -374,15 +382,15 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                 TextFormField(
                   controller: _note,
                   maxLines: 2,
-                  decoration: const InputDecoration(
-                    labelText: 'Note (optional)',
+                  decoration: InputDecoration(
+                    labelText: context.l10n.noteOptional,
                   ),
                 ),
                 if (draft.rawText.trim().isNotEmpty && _existing == null) ...[
                   const SizedBox(height: 16),
                   Card(
                     child: ExpansionTile(
-                      title: const Text('View recognized text'),
+                      title: Text(context.l10n.viewRecognizedText),
                       children: [
                         Padding(
                           padding: const EdgeInsets.all(16),
@@ -412,10 +420,10 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                       : const Icon(Icons.check),
                   label: Text(
                     _saving
-                        ? 'Saving…'
+                        ? context.l10n.saving
                         : _existing == null
-                        ? 'Confirm & save'
-                        : 'Save changes',
+                        ? context.l10n.confirmSave
+                        : context.l10n.saveChanges,
                   ),
                 ),
               ],

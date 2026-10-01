@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../core/categories.dart';
 import '../core/formatters.dart';
+import '../l10n/l10n.dart';
 
 class DonutChart extends StatefulWidget {
   const DonutChart({super.key, required this.values});
@@ -52,7 +53,7 @@ class _DonutChartState extends State<DonutChart>
   Widget build(BuildContext context) {
     final total = widget.values.values.fold<int>(0, (a, b) => a + b);
     return Semantics(
-      label: 'Spending by category, total ${formatVnd(total)}',
+      label: context.l10n.categoryChartSemantics(formatVnd(total)),
       child: SizedBox(
         height: 230,
         child: Stack(
@@ -73,7 +74,7 @@ class _DonutChartState extends State<DonutChart>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'All spending',
+                  context.l10n.allSpending,
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
                 const SizedBox(height: 4),

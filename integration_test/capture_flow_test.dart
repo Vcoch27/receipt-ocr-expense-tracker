@@ -88,6 +88,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          localeProvider.overrideWith((ref) => const Locale('en')),
           expenseRepositoryProvider.overrideWithValue(repository),
           receiptScanServiceProvider.overrideWithValue(_FakeCapture()),
         ],

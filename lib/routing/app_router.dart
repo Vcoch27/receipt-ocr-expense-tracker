@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../models/expense_item.dart';
 import '../models/parsed_expense.dart';
+import '../l10n/l10n.dart';
 import '../screens/analytics_screen.dart';
 import '../screens/dashboard_screen.dart';
 import '../screens/expense_detail_screen.dart';
@@ -46,9 +47,9 @@ final appRouter = GoRouter(
       ),
     ),
   ],
-  errorBuilder: (_, state) => Scaffold(
-    appBar: AppBar(title: const Text('Page unavailable')),
-    body: Center(child: Text(state.error?.toString() ?? 'Page not found')),
+  errorBuilder: (context, state) => Scaffold(
+    appBar: AppBar(title: Text(context.l10n.pageUnavailable)),
+    body: Center(child: Text(context.l10n.pageNotFound)),
   ),
 );
 
@@ -73,21 +74,21 @@ class _AppShell extends StatelessWidget {
           2 => '/analytics',
           _ => '/',
         }),
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.space_dashboard_outlined),
             selectedIcon: Icon(Icons.space_dashboard),
-            label: 'Home',
+            label: context.l10n.home,
           ),
           NavigationDestination(
             icon: Icon(Icons.receipt_long_outlined),
             selectedIcon: Icon(Icons.receipt_long),
-            label: 'History',
+            label: context.l10n.history,
           ),
           NavigationDestination(
             icon: Icon(Icons.bar_chart_outlined),
             selectedIcon: Icon(Icons.bar_chart),
-            label: 'Insights',
+            label: context.l10n.insights,
           ),
         ],
       ),

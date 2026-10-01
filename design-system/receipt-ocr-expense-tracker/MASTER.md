@@ -13,6 +13,8 @@ The generated references below contain web patterns and glass effects. For this 
 - **Navigation:** Dashboard, History, Analytics in a three-destination Material navigation bar; scanning is a prominent dashboard action. Review and detail routes have a predictable back action.
 - **States:** Distinct loading, empty, error, and success feedback. Every interactive target at least 48dp; SafeArea; charts include legends and text totals, never color alone.
 - **Motion:** 300–500ms entrance for custom charts and a brief success cue. Reduce animation when accessibility settings request it.
+- **Language:** Vietnamese is the default. English is available from the home app bar. UI labels come from Flutter ARB files; stored categories and source values remain stable internal keys.
+- **Identity:** Use `assets/brand/receipt-mark.png` for the app bar and generated launcher assets. The blue receipt outline and green check carry the identity; do not add decorative gradients or glass effects around it.
 
 ---
 
