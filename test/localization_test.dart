@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:smart_expense_capture/main.dart';
@@ -21,6 +22,10 @@ void main() {
   testWidgets('Vietnamese is primary and the user can switch to English', (
     tester,
   ) async {
+    tester.view.physicalSize = const Size(720, 1600);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
     appRouter.go('/');
     await tester.pumpWidget(
       ProviderScope(
@@ -33,12 +38,15 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Ghi lại từng khoản chi'), findsOneWidget);
     expect(find.text('Lịch sử'), findsOneWidget);
+    expect(tester.takeException(), isNull);
 
     await tester.tap(find.byTooltip('Ngôn ngữ'));
     await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(find.text('Capture what you spend'), findsOneWidget);
     expect(find.text('History'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

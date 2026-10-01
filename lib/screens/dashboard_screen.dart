@@ -156,9 +156,13 @@ class _DashboardContent extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              context.l10n.recentActivity,
-              style: theme.textTheme.titleLarge,
+            Expanded(
+              child: Text(
+                context.l10n.recentActivity,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleLarge,
+              ),
             ),
             if (items.isNotEmpty)
               TextButton(
