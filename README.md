@@ -19,7 +19,8 @@ screenshot extension. The receipt path remains fully available.
 - One review form with explicit confirmation, validation, correction,
   manual fallback, and a non-blocking duplicate warning.
 - Local SQLite CRUD, persistent image copies, reactive Riverpod 2 history,
-  and custom animated category donut and weekly bar charts.
+  and custom animated charts. The category donut matches the dashboard's
+  current calendar month; weekly bars use the verified transaction date.
 - Material 3, light/dark/system appearance, responsive layout, and empty,
   loading, and error states. Vietnamese is the default interface language;
   the language control on the home app bar switches to English.
@@ -76,9 +77,9 @@ testable and return nullable fields. No OCR value is saved without review.
 
 | Field | Heuristic | Failure behavior |
 |---|---|---|
-| Receipt total | Weighted total, tổng tiền, thanh toán, cộng tiền, amount due lines; adjacent line when needed | Blank amount |
-| VND amount | Integer or grouped thousands: 150000, 150.000, 150,000, with VNĐ/đ | Reject ambiguous decimals |
-| Receipt merchant | First plausible header, excluding invoice/date/address/phone labels | Blank merchant |
+| Receipt total | Weighted total, tổng hóa đơn, khách phải trả, tiền mặt, thanh toán, cộng tiền, amount due; when ML Kit reads price columns last, accept only a trailing maximum after a total cue | Blank amount if ambiguous |
+| VND amount | Integer or grouped thousands: 150000, 150.000, 150,000; OCR-spaced 537, 000 and grouped O/0 confusion 537, O00; with VNĐ/đ | Reject ambiguous decimals |
+| Receipt merchant | Plausible header, or store name just after an invoice title when OCR puts an address first; exclude address/phone labels | Blank merchant |
 | Date | Strict dd/MM/yyyy or yyyy-MM-dd; reject impossible days | Blank date |
 | Payment amount | Prioritize số tiền/amount labels and currency lines | Blank amount |
 | Recipient | Người nhận/recipient/beneficiary labels; cautious unlabeled name immediately after the payment timestamp | Blank recipient |
@@ -88,7 +89,9 @@ testable and return nullable fields. No OCR value is saved without review.
 
 Payment OCR text is shown in memory during review but **not persisted**, as it
 can contain account numbers. The screenshot image remains in app-owned local
-storage. No OCR text or images are uploaded. Normal history does not display
+storage. The ordinary ML Kit flow uploads nothing. The optional Gemini action
+uploads the selected image and OCR text only after explicit consent; see
+`tools/gemini_proxy/README.md`. Normal history does not display
 account details.
 
 ## Database and state
@@ -115,6 +118,19 @@ The Android application ID is vn.vku.smart_expense_capture; minimum Android
 SDK is 24 (Flutter 3.47 default). The core flow works without a network connection.
 UI strings use Flutter ARB resources in `lib/l10n`; saved categories retain
 stable keys, so switching languages does not rewrite expense records.
+
+### Optional Gemini second opinion
+
+Gemini 2.5 Flash-Lite can suggest merchant/recipient, VND amount, date,
+transfer note and reference when the local result is uncertain. The user
+starts this action from Review, consents to sending the image and OCR text,
+inspects the suggested values, chooses whether to apply them, and then
+confirms the final form before SQLite is updated. ML Kit and the deterministic
+parsers remain the required default path. A key is never included in the APK.
+
+For local Samsung setup, proxy commands, API-key handling and deployment
+limits, read [Gemini proxy setup](tools/gemini_proxy/README.md). Without
+`AI_PROXY_URL` the AI button is hidden and the offline app behaves as before.
 
 ## Tests and analysis
 
@@ -148,8 +164,9 @@ adb install -r on a physical Android device. Never commit signing credentials.
 The [light home](docs/screenshots/light-home.png) and
 [dark home](docs/screenshots/dark-home.png) screenshots show the Vietnamese
 release with the new brand mark on the Samsung device. The
-[review](docs/screenshots/dark-review.png) and
-[analytics](docs/screenshots/dark-weekly.png) screenshots show the same flows
+[monthly insights](docs/screenshots/dark-insights-month.png) screenshot shows
+the category total matching the dashboard and the weekly bar below it. The
+[review](docs/screenshots/dark-review.png) screenshot shows the same form
 from an earlier English build. The
 [technical report](output/pdf/smart_expense_technical_report.pdf)
 contains the architecture diagram, heuristic table, and light/dark screenshots.

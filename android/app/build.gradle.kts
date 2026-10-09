@@ -48,6 +48,10 @@ android {
         }
     }
     buildTypes {
+        debug {
+            // Keep automated tests separate from the signed app and its data.
+            applicationIdSuffix = ".debug"
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
             // ML Kit's bundled recognizer loads components dynamically. R8's

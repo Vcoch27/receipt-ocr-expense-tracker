@@ -28,6 +28,55 @@ void main() {
     expect(parser.parse('SHOP TEST\nCộng tiền\n150.000').total, 150000);
   });
 
+  test('finds a final invoice total when ML Kit reads price columns last', () {
+    final result = parser.parse(
+      'BIDA SAMPLE\nTổng dịch vụ:\nTổng tiền giờ:\nTổng hóa đơn:\n'
+      'Giá\n20.000\n25.000\nTổng\n40.000\n125.000\n11.000\n136.000',
+    );
+    expect(result.total, 136000);
+  });
+
+  test('prioritizes customer payable over item subtotal', () {
+    final result = parser.parse(
+      'SHOP TEST\nTổng tiền hàng\nKhách phải trả\nTiền khách đưa\n'
+      '900,000\n35,000\n935,000\n935,000',
+    );
+    expect(result.total, 935000);
+  });
+
+  test(
+    'finds store name after an invoice title when OCR begins with address',
+    () {
+      final result = parser.parse(
+        'Ngày bán\nThôn Đa, Di Trạch, Huyện Hoài Đức,\nHoài Đức,\nNN\nKH\n'
+        'Áo sơ mi kẻ sọc -L\n450,000\nHÓA ĐƠN BÁN HÀNG\nTiền mặt\n'
+        'thietbisieuthi\nTổng tiền hàng\nKhách phải trả\n'
+        '900,000\n935,000',
+      );
+      expect(result.merchant, 'thietbisieuthi');
+    },
+  );
+
+  test('handles a cash-total column with OCR spaces after commas', () {
+    final result = parser.parse(
+      'FOOD SHOP\nTIEN MAT\n000887\n42,000\n37, 000\n'
+      '172, 000\n537, O00\nCAM ON QUY KHACH',
+    );
+    expect(result.total, 537000);
+  });
+
+  test(
+    'keeps an ambiguous column blank when the last amount is not largest',
+    () {
+      expect(
+        parser
+            .parse('SHOP TEST\nKhách phải trả\nMã hóa đơn\n900.000\n35.000')
+            .total,
+        isNull,
+      );
+    },
+  );
+
   test('leaves total null without a reliable total cue', () {
     expect(parser.parse('SHOP TEST\nSản phẩm A 150.000').total, isNull);
   });
@@ -53,9 +102,16 @@ void main() {
       '150,000',
       '150.000 đ',
       '150,000 VNĐ',
+      '537, 000',
+      '537, O00',
     ]) {
-      expect(ReceiptParser.parseVnd(format), 150000, reason: format);
+      expect(
+        ReceiptParser.parseVnd(format),
+        format.startsWith('537') ? 537000 : 150000,
+        reason: format,
+      );
     }
     expect(ReceiptParser.parseVnd('150,50'), isNull);
+    expect(ReceiptParser.parseVnd('O00'), isNull);
   });
 }

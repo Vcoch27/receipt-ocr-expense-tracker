@@ -39,6 +39,7 @@ migrate_working_dir/
 /android/key.properties
 *.jks
 *.keystore
+**/.env
 
 # Symbolication related
 app.*.symbols

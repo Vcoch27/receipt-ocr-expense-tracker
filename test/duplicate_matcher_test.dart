@@ -10,15 +10,17 @@ ExpenseItem expense({
   int amount = 150000,
   ExpenseSource source = ExpenseSource.bankScreenshot,
   String? reference,
+  DateTime? date,
+  DateTime? createdAt,
 }) => ExpenseItem(
   id: id,
   merchant: merchant,
   amount: amount,
-  date: DateTime(2026, 10, 1),
+  date: date ?? DateTime(2026, 10, 1),
   category: 'Shopping',
   source: source,
   transactionReference: reference,
-  createdAt: DateTime(2026, 10, 1),
+  createdAt: createdAt ?? DateTime(2026, 10, 1),
   updatedAt: DateTime(2026, 10, 1),
 );
 
@@ -59,5 +61,29 @@ void main() {
     expect(analytics.total, 420000);
     expect(analytics.byCategory['Shopping'], 420000);
     expect(analytics.weekly.fold<int>(0, (a, b) => a + b), 420000);
+  });
+
+  test('monthly category totals and weekly bars use transaction dates', () {
+    final analytics = ExpenseAnalytics.fromItems([
+      expense(
+        amount: 33000,
+        date: DateTime(2026, 10, 3),
+        createdAt: DateTime(2026, 10, 1),
+      ),
+      expense(
+        amount: 2000000,
+        date: DateTime(2026, 9, 21),
+        createdAt: DateTime(2026, 10, 1),
+      ),
+      expense(
+        amount: 600000,
+        date: DateTime(2026, 9, 18),
+        createdAt: DateTime(2026, 10, 3),
+      ),
+    ], now: DateTime(2026, 10, 1));
+    expect(analytics.total, 33000);
+    expect(analytics.byCategory['Shopping'], 33000);
+    expect(analytics.weekStart, DateTime(2026, 9, 28));
+    expect(analytics.weekly, [0, 0, 0, 0, 0, 33000, 0]);
   });
 }

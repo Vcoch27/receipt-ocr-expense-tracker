@@ -29,9 +29,7 @@ class ReceiptScanService implements ExpenseCaptureService {
   Future<ParsedExpense?> captureReceipt(ImageSource source) async {
     final image = await _pick(source);
     if (image == null) return null;
-    final rawText = await ocr
-        .recognize(image.path)
-        .timeout(const Duration(seconds: 40));
+    final rawText = await _recognizeOrEmpty(image.path);
     final receipt = receiptParser.parse(rawText, imagePath: image.path);
     return ParsedExpense.fromReceipt(receipt);
   }
@@ -40,10 +38,20 @@ class ReceiptScanService implements ExpenseCaptureService {
   Future<ParsedExpense?> importPaymentScreenshot() async {
     final image = await _pick(ImageSource.gallery);
     if (image == null) return null;
-    final rawText = await ocr
-        .recognize(image.path)
-        .timeout(const Duration(seconds: 40));
+    final rawText = await _recognizeOrEmpty(image.path);
     return paymentParser.parse(rawText, imagePath: image.path);
+  }
+
+  Future<String> _recognizeOrEmpty(String imagePath) async {
+    try {
+      return await ocr
+          .recognize(imagePath)
+          .timeout(const Duration(seconds: 40));
+    } on Exception {
+      // The selected image is still available for manual review or an
+      // explicitly requested AI second opinion. Never silently save it.
+      return '';
+    }
   }
 
   Future<XFile?> _pick(ImageSource source) async {

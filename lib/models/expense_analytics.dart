@@ -27,12 +27,16 @@ class ExpenseAnalytics {
     final days = List<int>.filled(7, 0);
     var total = 0;
     for (final item in items) {
-      total += item.amount;
-      categories.update(
-        item.category,
-        (value) => value + item.amount,
-        ifAbsent: () => item.amount,
-      );
+      // Match the dashboard's calendar-month summary. Both views use the
+      // verified transaction date, never the row's creation timestamp.
+      if (item.date.year == today.year && item.date.month == today.month) {
+        total += item.amount;
+        categories.update(
+          item.category,
+          (value) => value + item.amount,
+          ifAbsent: () => item.amount,
+        );
+      }
       final date = DateTime(item.date.year, item.date.month, item.date.day);
       final dayIndex = date.difference(start).inDays;
       if (dayIndex >= 0 && dayIndex < 7) {

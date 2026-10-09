@@ -199,10 +199,11 @@ def main():
     ))
     story.append(table([
         ["Field", "Detection rule", "Review fallback"],
-        ["Receipt total", "Weighted total/tổng tiền/thanh toán/cộng tiền/"
-         "amount due line; adjacent amount line; VND grouping.", "Blank amount"],
-        ["Receipt merchant", "First plausible header; reject invoice, address, "
-         "phone and date labels.", "Blank merchant"],
+        ["Receipt total", "Weighted total/tổng hóa đơn/khách phải trả/"
+         "tiền mặt/amount due; accept a trailing price-column maximum only "
+         "after a total cue; VND grouping.", "Blank if ambiguous"],
+        ["Receipt merchant", "Plausible header or store name after invoice "
+         "title; reject address, phone, and date labels.", "Blank merchant"],
         ["Date/time", "Strict dd/MM/yyyy or yyyy-MM-dd, plus HH:mm for "
          "payments; reject impossible dates.", "Editable date/time"],
         ["Payment amount", "Prefer số tiền/amount and currency-bearing lines; "
