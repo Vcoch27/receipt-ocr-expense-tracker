@@ -13,6 +13,7 @@ import '../models/expense_item.dart';
 import '../models/expense_source.dart';
 import '../models/parsed_expense.dart';
 import '../routing/app_router.dart';
+import '../services/ai_receipt_service.dart';
 import '../state/expense_providers.dart';
 import '../widgets/page_container.dart';
 
@@ -37,6 +38,8 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   String _category = categories.last;
   PaymentStatus? _status;
   bool _saving = false;
+  bool _readingWithAi = false;
+  String? _aiError;
   String? _saveError;
 
   ParsedExpense get _draft => widget.args.draft ?? const ParsedExpense.manual();
@@ -91,6 +94,114 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
       lastDate: DateTime(2100),
     );
     if (chosen != null) _date.text = formatDate(chosen);
+  }
+
+  Future<void> _readWithAi() async {
+    if (_readingWithAi || _saving) return;
+    final consent = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(context.l10n.aiConsentTitle),
+        content: Text(context.l10n.aiConsentBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: Text(context.l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(context.l10n.aiSendImage),
+          ),
+        ],
+      ),
+    );
+    if (consent != true || !mounted) return;
+    setState(() {
+      _readingWithAi = true;
+      _aiError = null;
+    });
+    try {
+      final suggestion = await ref
+          .read(aiReceiptServiceProvider)
+          .suggest(_draft);
+      if (!mounted) return;
+      if (suggestion.isEmpty) {
+        setState(() => _aiError = context.l10n.aiNoSuggestion);
+        return;
+      }
+      final apply = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: Text(context.l10n.aiSuggestionTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(context.l10n.aiSuggestionHint),
+                const SizedBox(height: 16),
+                if (suggestion.merchant != null)
+                  Text('${context.l10n.merchant}: ${suggestion.merchant}'),
+                if (suggestion.amount != null)
+                  Text(
+                    '${context.l10n.amountVnd}: ${formatVnd(suggestion.amount!)}',
+                  ),
+                if (suggestion.date != null)
+                  Text(
+                    '${context.l10n.transactionDate}: ${formatDate(suggestion.date!)}',
+                  ),
+                if (suggestion.note != null)
+                  Text('${context.l10n.note}: ${suggestion.note}'),
+                if (suggestion.transactionReference != null)
+                  Text(
+                    '${context.l10n.reference}: ${suggestion.transactionReference}',
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(context.l10n.cancel),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(context.l10n.aiApplySuggestion),
+            ),
+          ],
+        ),
+      );
+      if (apply == true && mounted) {
+        _applyAiSuggestion(suggestion);
+      }
+    } catch (_) {
+      if (mounted) setState(() => _aiError = context.l10n.aiReadError);
+    } finally {
+      if (mounted) setState(() => _readingWithAi = false);
+    }
+  }
+
+  void _applyAiSuggestion(AiExpenseSuggestion suggestion) {
+    setState(() {
+      if (suggestion.merchant != null) {
+        _merchant.text = suggestion.merchant!;
+      }
+      if (suggestion.amount != null) {
+        _amount.text = suggestion.amount.toString();
+      }
+      if (suggestion.date != null) {
+        _date.text = formatDate(suggestion.date!);
+        if (_isPayment) {
+          _time.clear();
+        }
+      }
+      if (suggestion.note != null) {
+        _note.text = suggestion.note!;
+      }
+      if (_isPayment && suggestion.transactionReference != null) {
+        _reference.text = suggestion.transactionReference!;
+      }
+    });
   }
 
   ExpenseItem _itemFromForm() {
@@ -238,6 +349,34 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                       ),
                     ),
                   ),
+                ],
+                if (_existing == null &&
+                    image != null &&
+                    ref.read(aiReceiptServiceProvider).isAvailable) ...[
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    key: const ValueKey('read_with_ai'),
+                    onPressed: _readingWithAi ? null : _readWithAi,
+                    icon: _readingWithAi
+                        ? const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Icon(Icons.auto_awesome_outlined),
+                    label: Text(
+                      _readingWithAi
+                          ? context.l10n.aiReading
+                          : context.l10n.aiReadAgain,
+                    ),
+                  ),
+                  if (_aiError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _aiError!,
+                      style: TextStyle(color: theme.colorScheme.error),
+                    ),
+                  ],
                 ],
                 if (_existing == null &&
                     draft.rawText.trim().isEmpty &&

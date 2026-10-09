@@ -9,6 +9,7 @@ import 'package:smart_expense_capture/models/parsed_expense.dart';
 import 'package:smart_expense_capture/routing/app_router.dart';
 import 'package:smart_expense_capture/screens/review_screen.dart';
 import 'package:smart_expense_capture/services/expense_database.dart';
+import 'package:smart_expense_capture/services/ai_receipt_service.dart';
 import 'package:smart_expense_capture/state/expense_providers.dart';
 
 class _MemoryRepository implements ExpenseRepository {
@@ -34,11 +35,29 @@ class _MemoryRepository implements ExpenseRepository {
   }
 }
 
+class _FakeAiService implements AiReceiptService {
+  int calls = 0;
+
+  @override
+  bool get isAvailable => true;
+
+  @override
+  Future<AiExpenseSuggestion> suggest(ParsedExpense draft) async {
+    calls++;
+    return AiExpenseSuggestion(
+      merchant: 'AI Market',
+      amount: 175000,
+      date: DateTime(2026, 10, 9),
+    );
+  }
+}
+
 Future<void> _pumpReview(
   WidgetTester tester,
   _MemoryRepository repository,
   ParsedExpense draft, {
   Locale locale = const Locale('en'),
+  AiReceiptService? aiService,
 }) async {
   final router = GoRouter(
     routes: [
@@ -55,7 +74,11 @@ Future<void> _pumpReview(
   addTearDown(router.dispose);
   await tester.pumpWidget(
     ProviderScope(
-      overrides: [expenseRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        expenseRepositoryProvider.overrideWithValue(repository),
+        if (aiService != null)
+          aiReceiptServiceProvider.overrideWithValue(aiService),
+      ],
       child: MaterialApp.router(
         routerConfig: router,
         locale: locale,
@@ -85,6 +108,63 @@ void main() {
     amount: 150000,
     rawText: 'Cửa hàng An\nTổng tiền 150.000',
   );
+
+  testWidgets('AI requires upload consent and explicit application', (
+    tester,
+  ) async {
+    final repo = _MemoryRepository();
+    final ai = _FakeAiService();
+    await _pumpReview(
+      tester,
+      repo,
+      const ParsedExpense(
+        source: ExpenseSource.receipt,
+        merchant: 'Local OCR',
+        amount: 150000,
+        rawText: 'Local OCR',
+        imagePath: '/nonexistent/receipt.jpg',
+      ),
+      aiService: ai,
+    );
+    await tester.tap(find.byKey(const ValueKey('read_with_ai')));
+    await tester.pumpAndSettle();
+    expect(find.text('Send this image to Gemini?'), findsOneWidget);
+    await tester.tap(find.text('Cancel').last);
+    await tester.pumpAndSettle();
+    expect(ai.calls, 0);
+
+    await tester.tap(find.byKey(const ValueKey('read_with_ai')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Send image'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    expect(ai.calls, 1);
+    expect(find.text('AI suggestions'), findsOneWidget);
+    expect(
+      tester
+          .widget<TextFormField>(find.byKey(const ValueKey('merchant_field')))
+          .controller!
+          .text,
+      'Local OCR',
+    );
+    await tester.tap(find.text('Apply suggestions'));
+    await tester.pumpAndSettle();
+    expect(
+      tester
+          .widget<TextFormField>(find.byKey(const ValueKey('merchant_field')))
+          .controller!
+          .text,
+      'AI Market',
+    );
+    expect(
+      tester
+          .widget<TextFormField>(find.byKey(const ValueKey('amount_field')))
+          .controller!
+          .text,
+      '175000',
+    );
+    expect(repo.items, isEmpty);
+  });
 
   testWidgets('review shows parsed values and requires a valid date', (
     tester,

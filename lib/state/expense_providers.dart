@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../models/expense_item.dart';
 import '../models/expense_analytics.dart';
 import '../services/duplicate_matcher.dart';
+import '../services/ai_receipt_service.dart';
 import '../services/expense_database.dart';
 import '../services/expense_source_classifier.dart';
 import '../services/ocr_service.dart';
@@ -19,6 +20,9 @@ final imageStoreProvider = Provider<ReceiptImageStore>(
   (ref) => ReceiptImageStore(),
 );
 final ocrServiceProvider = Provider<OcrService>((ref) => MlKitOcrService());
+final aiReceiptServiceProvider = Provider<AiReceiptService>(
+  (ref) => const ProxyAiReceiptService(String.fromEnvironment('AI_PROXY_URL')),
+);
 final receiptParserProvider = Provider<ReceiptParser>(
   (ref) => const ReceiptParser(),
 );
