@@ -257,7 +257,7 @@ abstract class AppLocalizations {
   /// No description provided for @localPrivacyHint.
   ///
   /// In en, this message translates to:
-  /// **'Your image stays on this device. Every OCR result is reviewed before saving.'**
+  /// **'OCR runs on this device. AI upload is optional and requires your consent during review.'**
   String get localPrivacyHint;
 
   /// No description provided for @importPaymentScreenshot.
@@ -355,6 +355,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'OCR can misread amounts and names. Correct any field that is missing or wrong.'**
   String get reviewHint;
+
+  /// No description provided for @aiReadAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Read again with AI'**
+  String get aiReadAgain;
+
+  /// No description provided for @aiReading.
+  ///
+  /// In en, this message translates to:
+  /// **'AI is reading…'**
+  String get aiReading;
+
+  /// No description provided for @aiConsentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send this image to Gemini?'**
+  String get aiConsentTitle;
+
+  /// No description provided for @aiConsentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The image and on-device OCR text will be sent to Gemini through your configured proxy. This is optional. Google\'s free tier may use submitted content to improve products. Check privacy terms before sending bank details, then verify every suggestion.'**
+  String get aiConsentBody;
+
+  /// No description provided for @aiSendImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Send image'**
+  String get aiSendImage;
+
+  /// No description provided for @aiSuggestionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI suggestions'**
+  String get aiSuggestionTitle;
+
+  /// No description provided for @aiSuggestionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'AI can make mistakes. Apply these suggestions only after comparing them with the image. You can edit every field afterward.'**
+  String get aiSuggestionHint;
+
+  /// No description provided for @aiApplySuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply suggestions'**
+  String get aiApplySuggestion;
+
+  /// No description provided for @aiNoSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'AI could not confidently identify any fields. Enter them manually.'**
+  String get aiNoSuggestion;
+
+  /// No description provided for @aiReadError.
+  ///
+  /// In en, this message translates to:
+  /// **'AI reading failed. Check the proxy connection or continue manually.'**
+  String get aiReadError;
 
   /// No description provided for @imagePreviewUnavailable.
   ///
@@ -692,6 +752,12 @@ abstract class AppLocalizations {
   /// **'Your saved expenses will appear here.'**
   String get emptyChartHint;
 
+  /// No description provided for @noCurrentPeriodExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses this month or week. Older records remain in History.'**
+  String get noCurrentPeriodExpenses;
+
   /// No description provided for @spendingOverview.
   ///
   /// In en, this message translates to:
@@ -703,6 +769,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'By category'**
   String get byCategory;
+
+  /// No description provided for @noExpensesThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses this month.'**
+  String get noExpensesThisMonth;
+
+  /// No description provided for @chartUsesTransactionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Bars use the verified transaction date.'**
+  String get chartUsesTransactionDate;
 
   /// No description provided for @thisWeek.
   ///
@@ -719,13 +797,13 @@ abstract class AppLocalizations {
   /// No description provided for @allSpending.
   ///
   /// In en, this message translates to:
-  /// **'All spending'**
+  /// **'This month'**
   String get allSpending;
 
   /// No description provided for @categoryChartSemantics.
   ///
   /// In en, this message translates to:
-  /// **'Spending by category, total {amount}'**
+  /// **'This month\'s spending by category, total {amount}'**
   String categoryChartSemantics(String amount);
 
   /// No description provided for @weekChartSemantics.

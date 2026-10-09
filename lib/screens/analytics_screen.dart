@@ -28,11 +28,11 @@ class AnalyticsScreen extends ConsumerWidget {
             title: context.l10n.insightsUnavailable,
             message: context.l10n.retryHint,
           ),
-          data: (data) => data.total == 0
+          data: (data) => data.total == 0 && data.weekly.every((v) => v == 0)
               ? ExpenseState(
                   icon: Icons.donut_large_outlined,
                   title: context.l10n.nothingToChart,
-                  message: context.l10n.emptyChartHint,
+                  message: context.l10n.noCurrentPeriodExpenses,
                   action: FilledButton(
                     onPressed: () => context.push('/scan'),
                     child: Text(context.l10n.addExpense),
@@ -56,7 +56,20 @@ class AnalyticsScreen extends ConsumerWidget {
                               context.l10n.byCategory,
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
-                            DonutChart(values: data.byCategory),
+                            const SizedBox(height: 4),
+                            Text(
+                              context.l10n.spentThisMonth,
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            if (data.total == 0)
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 24,
+                                ),
+                                child: Text(context.l10n.noExpensesThisMonth),
+                              )
+                            else
+                              DonutChart(values: data.byCategory),
                             ...data.byCategory.entries.map(
                               (entry) => Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -97,6 +110,11 @@ class AnalyticsScreen extends ConsumerWidget {
                             const SizedBox(height: 4),
                             Text(
                               context.l10n.fromDate(formatDate(data.weekStart)),
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              context.l10n.chartUsesTransactionDate,
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             const SizedBox(height: 20),

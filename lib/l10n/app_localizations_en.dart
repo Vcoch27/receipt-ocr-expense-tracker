@@ -93,7 +93,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get localPrivacyHint =>
-      'Your image stays on this device. Every OCR result is reviewed before saving.';
+      'OCR runs on this device. AI upload is optional and requires your consent during review.';
 
   @override
   String get importPaymentScreenshot => 'Import Payment Screenshot';
@@ -147,6 +147,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reviewHint =>
       'OCR can misread amounts and names. Correct any field that is missing or wrong.';
+
+  @override
+  String get aiReadAgain => 'Read again with AI';
+
+  @override
+  String get aiReading => 'AI is reading…';
+
+  @override
+  String get aiConsentTitle => 'Send this image to Gemini?';
+
+  @override
+  String get aiConsentBody =>
+      'The image and on-device OCR text will be sent to Gemini through your configured proxy. This is optional. Google\'s free tier may use submitted content to improve products. Check privacy terms before sending bank details, then verify every suggestion.';
+
+  @override
+  String get aiSendImage => 'Send image';
+
+  @override
+  String get aiSuggestionTitle => 'AI suggestions';
+
+  @override
+  String get aiSuggestionHint =>
+      'AI can make mistakes. Apply these suggestions only after comparing them with the image. You can edit every field afterward.';
+
+  @override
+  String get aiApplySuggestion => 'Apply suggestions';
+
+  @override
+  String get aiNoSuggestion =>
+      'AI could not confidently identify any fields. Enter them manually.';
+
+  @override
+  String get aiReadError =>
+      'AI reading failed. Check the proxy connection or continue manually.';
 
   @override
   String get imagePreviewUnavailable => 'Image preview unavailable';
@@ -322,10 +356,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emptyChartHint => 'Your saved expenses will appear here.';
 
   @override
+  String get noCurrentPeriodExpenses =>
+      'No expenses this month or week. Older records remain in History.';
+
+  @override
   String get spendingOverview => 'Spending overview';
 
   @override
   String get byCategory => 'By category';
+
+  @override
+  String get noExpensesThisMonth => 'No expenses this month.';
+
+  @override
+  String get chartUsesTransactionDate =>
+      'Bars use the verified transaction date.';
 
   @override
   String get thisWeek => 'This week';
@@ -336,11 +381,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get allSpending => 'All spending';
+  String get allSpending => 'This month';
 
   @override
   String categoryChartSemantics(String amount) {
-    return 'Spending by category, total $amount';
+    return 'This month\'s spending by category, total $amount';
   }
 
   @override

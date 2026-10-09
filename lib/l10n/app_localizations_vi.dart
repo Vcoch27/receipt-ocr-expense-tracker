@@ -93,7 +93,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get localPrivacyHint =>
-      'Ảnh chỉ ở trên thiết bị. Bạn luôn kiểm tra kết quả OCR trước khi lưu.';
+      'OCR chạy trên thiết bị. Chỉ gửi ảnh lên AI nếu bạn đồng ý ở bước kiểm tra.';
 
   @override
   String get importPaymentScreenshot => 'Nhập ảnh thanh toán';
@@ -146,6 +146,40 @@ class AppLocalizationsVi extends AppLocalizations {
   @override
   String get reviewHint =>
       'OCR có thể đọc sai số tiền và tên. Hãy sửa các trường còn thiếu hoặc chưa đúng.';
+
+  @override
+  String get aiReadAgain => 'Đọc lại bằng AI';
+
+  @override
+  String get aiReading => 'AI đang đọc…';
+
+  @override
+  String get aiConsentTitle => 'Gửi ảnh này đến Gemini?';
+
+  @override
+  String get aiConsentBody =>
+      'Ảnh và văn bản OCR trên máy sẽ được gửi đến Gemini qua máy chủ đã cấu hình. Đây là lựa chọn không bắt buộc. Gói miễn phí của Google có thể dùng dữ liệu gửi lên để cải thiện sản phẩm. Hãy xem điều khoản riêng tư trước khi gửi thông tin ngân hàng và kiểm tra mọi gợi ý.';
+
+  @override
+  String get aiSendImage => 'Gửi ảnh';
+
+  @override
+  String get aiSuggestionTitle => 'Gợi ý từ AI';
+
+  @override
+  String get aiSuggestionHint =>
+      'AI có thể đọc sai. Chỉ áp dụng sau khi đối chiếu với ảnh. Bạn vẫn có thể sửa từng trường.';
+
+  @override
+  String get aiApplySuggestion => 'Áp dụng gợi ý';
+
+  @override
+  String get aiNoSuggestion =>
+      'AI không xác định chắc chắn trường nào. Hãy nhập thủ công.';
+
+  @override
+  String get aiReadError =>
+      'AI không đọc được. Kiểm tra kết nối máy chủ hoặc tiếp tục nhập thủ công.';
 
   @override
   String get imagePreviewUnavailable => 'Không xem trước được ảnh';
@@ -319,10 +353,21 @@ class AppLocalizationsVi extends AppLocalizations {
   String get emptyChartHint => 'Khoản chi đã lưu sẽ xuất hiện tại đây.';
 
   @override
+  String get noCurrentPeriodExpenses =>
+      'Chưa có khoản chi trong tháng hoặc tuần này. Các khoản cũ vẫn ở Lịch sử.';
+
+  @override
   String get spendingOverview => 'Tổng quan chi tiêu';
 
   @override
   String get byCategory => 'Theo danh mục';
+
+  @override
+  String get noExpensesThisMonth => 'Chưa có khoản chi trong tháng này.';
+
+  @override
+  String get chartUsesTransactionDate =>
+      'Cột được đặt theo ngày giao dịch đã xác nhận.';
 
   @override
   String get thisWeek => 'Tuần này';
@@ -333,11 +378,11 @@ class AppLocalizationsVi extends AppLocalizations {
   }
 
   @override
-  String get allSpending => 'Tổng chi';
+  String get allSpending => 'Tháng này';
 
   @override
   String categoryChartSemantics(String amount) {
-    return 'Chi tiêu theo danh mục, tổng $amount';
+    return 'Chi tiêu tháng này theo danh mục, tổng $amount';
   }
 
   @override
