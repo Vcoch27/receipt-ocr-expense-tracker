@@ -152,6 +152,36 @@ abstract class AppLocalizations {
   /// **'Home'**
   String get home;
 
+  /// No description provided for @overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overview;
+
+  /// No description provided for @monthYear.
+  ///
+  /// In en, this message translates to:
+  /// **'{month}/{year}'**
+  String monthYear(int month, int year);
+
+  /// No description provided for @scanOrImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan / import'**
+  String get scanOrImport;
+
+  /// No description provided for @monthIncrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Up {percent}% vs last month'**
+  String monthIncrease(int percent);
+
+  /// No description provided for @monthDecrease.
+  ///
+  /// In en, this message translates to:
+  /// **'Down {percent}% vs last month'**
+  String monthDecrease(int percent);
+
   /// No description provided for @history.
   ///
   /// In en, this message translates to:
@@ -212,6 +242,48 @@ abstract class AppLocalizations {
   /// **'Spent this month'**
   String get spentThisMonth;
 
+  /// No description provided for @monthlyBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly budget'**
+  String get monthlyBudget;
+
+  /// No description provided for @setBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Set budget'**
+  String get setBudget;
+
+  /// No description provided for @editBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit budget'**
+  String get editBudget;
+
+  /// No description provided for @removeBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove budget'**
+  String get removeBudget;
+
+  /// No description provided for @budgetRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} remaining in budget'**
+  String budgetRemaining(String amount);
+
+  /// No description provided for @budgetExceeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Over budget by {amount}'**
+  String budgetExceeded(String amount);
+
+  /// No description provided for @budgetSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save budget. Please try again.'**
+  String get budgetSaveError;
+
   /// No description provided for @firstExpenseHint.
   ///
   /// In en, this message translates to:
@@ -253,6 +325,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Choose a source'**
   String get chooseSource;
+
+  /// No description provided for @threeStepFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'THREE SIMPLE STEPS'**
+  String get threeStepFlow;
+
+  /// No description provided for @stepPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose'**
+  String get stepPick;
+
+  /// No description provided for @stepReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get stepReview;
+
+  /// No description provided for @stepSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get stepSave;
 
   /// No description provided for @localPrivacyHint.
   ///
@@ -614,6 +710,54 @@ abstract class AppLocalizations {
   /// **'Expense history'**
   String get expenseHistory;
 
+  /// No description provided for @searchExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Search name, amount, or note'**
+  String get searchExpenses;
+
+  /// No description provided for @thisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This month'**
+  String get thisMonth;
+
+  /// No description provided for @lastMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Last month'**
+  String get lastMonth;
+
+  /// No description provided for @chooseMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose month'**
+  String get chooseMonth;
+
+  /// No description provided for @noCurrentWeekExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses this week.'**
+  String get noCurrentWeekExpenses;
+
+  /// No description provided for @historySummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} expenses'**
+  String historySummary(int count);
+
+  /// No description provided for @noMatchingExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching expenses'**
+  String get noMatchingExpenses;
+
+  /// No description provided for @adjustFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another search or filter.'**
+  String get adjustFilters;
+
   /// No description provided for @historyUnavailable.
   ///
   /// In en, this message translates to:
@@ -770,6 +914,18 @@ abstract class AppLocalizations {
   /// **'By category'**
   String get byCategory;
 
+  /// No description provided for @spendingNote.
+  ///
+  /// In en, this message translates to:
+  /// **'From your data'**
+  String get spendingNote;
+
+  /// No description provided for @topCategoryInsight.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest category: {category}, {percent}% of spending in the selected month.'**
+  String topCategoryInsight(String category, int percent);
+
   /// No description provided for @noExpensesThisMonth.
   ///
   /// In en, this message translates to:
@@ -803,7 +959,7 @@ abstract class AppLocalizations {
   /// No description provided for @categoryChartSemantics.
   ///
   /// In en, this message translates to:
-  /// **'This month\'s spending by category, total {amount}'**
+  /// **'Spending by category, total {amount}'**
   String categoryChartSemantics(String amount);
 
   /// No description provided for @weekChartSemantics.

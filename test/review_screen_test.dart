@@ -126,6 +126,13 @@ void main() {
       ),
       aiService: ai,
     );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('read_with_ai')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.ensureVisible(find.byKey(const ValueKey('read_with_ai')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('read_with_ai')));
     await tester.pumpAndSettle();
     expect(find.text('Send this image to Gemini?'), findsOneWidget);
@@ -196,6 +203,11 @@ void main() {
       tester,
       repo,
       const ParsedExpense(source: ExpenseSource.receipt, rawText: ''),
+    );
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('date_field')),
+      200,
+      scrollable: find.byType(Scrollable).first,
     );
     await tester.enterText(
       find.byKey(const ValueKey('date_field')),

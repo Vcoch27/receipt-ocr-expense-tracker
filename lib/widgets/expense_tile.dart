@@ -12,41 +12,78 @@ class ExpenseTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final color = categoryColor(item.category);
+    final icon = switch (item.category) {
+      'Food & drink' => Icons.local_cafe_outlined,
+      'Transport' => Icons.directions_car_outlined,
+      'Shopping' => Icons.shopping_bag_outlined,
+      'Study' => Icons.school_outlined,
+      _ => Icons.receipt_long_outlined,
+    };
     return Card(
-      child: ListTile(
-        key: ValueKey('expense_${item.id}'),
+      margin: const EdgeInsets.only(bottom: 8),
+      child: InkWell(
         onTap: onTap,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-        leading: CircleAvatar(
-          backgroundColor: categoryColor(item.category).withValues(alpha: .14),
-          child: Icon(
-            Icons.payments_outlined,
-            color: categoryColor(item.category),
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 22,
+                backgroundColor: color.withValues(alpha: .15),
+                child: Icon(icon, color: color),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.merchant,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      formatDate(item.date),
+                      style: theme.textTheme.bodySmall,
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      localizedSource(context, item.source),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: theme.colorScheme.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    formatVnd(item.amount),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    localizedCategory(context, item.category),
+                    style: theme.textTheme.labelSmall,
+                  ),
+                ],
+              ),
+            ],
           ),
-        ),
-        title: Text(
-          item.merchant,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Text(
-          '${formatDate(item.date)} · ${localizedSource(context, item.source)}',
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              formatVnd(item.amount),
-              style: Theme.of(context).textTheme.titleSmall
-                  ?.copyWith(fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              localizedCategory(context, item.category),
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ],
         ),
       ),
     );

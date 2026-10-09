@@ -37,6 +37,27 @@ class AppLocalizationsVi extends AppLocalizations {
   String get home => 'Trang chủ';
 
   @override
+  String get overview => 'Tổng quan';
+
+  @override
+  String monthYear(int month, int year) {
+    return 'Tháng $month/$year';
+  }
+
+  @override
+  String get scanOrImport => 'Chụp / nhập ảnh';
+
+  @override
+  String monthIncrease(int percent) {
+    return 'Tăng $percent% so với tháng trước';
+  }
+
+  @override
+  String monthDecrease(int percent) {
+    return 'Giảm $percent% so với tháng trước';
+  }
+
+  @override
   String get history => 'Lịch sử';
 
   @override
@@ -68,6 +89,31 @@ class AppLocalizationsVi extends AppLocalizations {
   String get spentThisMonth => 'Đã chi trong tháng';
 
   @override
+  String get monthlyBudget => 'Ngân sách tháng';
+
+  @override
+  String get setBudget => 'Đặt ngân sách';
+
+  @override
+  String get editBudget => 'Sửa ngân sách';
+
+  @override
+  String get removeBudget => 'Xóa ngân sách';
+
+  @override
+  String budgetRemaining(String amount) {
+    return 'Còn $amount trong ngân sách';
+  }
+
+  @override
+  String budgetExceeded(String amount) {
+    return 'Đã vượt ngân sách $amount';
+  }
+
+  @override
+  String get budgetSaveError => 'Không lưu được ngân sách. Hãy thử lại.';
+
+  @override
   String get firstExpenseHint => 'Thêm khoản chi đầu tiên bên dưới';
 
   @override
@@ -90,6 +136,18 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get chooseSource => 'Chọn nguồn khoản chi';
+
+  @override
+  String get threeStepFlow => 'QUY TRÌNH 3 BƯỚC';
+
+  @override
+  String get stepPick => 'Chọn ảnh';
+
+  @override
+  String get stepReview => 'Kiểm tra';
+
+  @override
+  String get stepSave => 'Lưu sổ';
 
   @override
   String get localPrivacyHint =>
@@ -284,6 +342,32 @@ class AppLocalizationsVi extends AppLocalizations {
   String get expenseHistory => 'Lịch sử chi tiêu';
 
   @override
+  String get searchExpenses => 'Tìm tên, số tiền hoặc ghi chú';
+
+  @override
+  String get thisMonth => 'Tháng này';
+
+  @override
+  String get lastMonth => 'Tháng trước';
+
+  @override
+  String get chooseMonth => 'Chọn tháng';
+
+  @override
+  String get noCurrentWeekExpenses => 'Chưa có khoản chi trong tuần này.';
+
+  @override
+  String historySummary(int count) {
+    return '$count khoản chi';
+  }
+
+  @override
+  String get noMatchingExpenses => 'Không có khoản chi phù hợp';
+
+  @override
+  String get adjustFilters => 'Thử từ khóa hoặc bộ lọc khác.';
+
+  @override
   String get historyUnavailable => 'Không tải được lịch sử';
 
   @override
@@ -363,6 +447,14 @@ class AppLocalizationsVi extends AppLocalizations {
   String get byCategory => 'Theo danh mục';
 
   @override
+  String get spendingNote => 'Nhận xét từ dữ liệu';
+
+  @override
+  String topCategoryInsight(String category, int percent) {
+    return 'Chi nhiều nhất cho $category: $percent% tổng chi của tháng.';
+  }
+
+  @override
   String get noExpensesThisMonth => 'Chưa có khoản chi trong tháng này.';
 
   @override
@@ -382,7 +474,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String categoryChartSemantics(String amount) {
-    return 'Chi tiêu tháng này theo danh mục, tổng $amount';
+    return 'Chi tiêu theo danh mục, tổng $amount';
   }
 
   @override

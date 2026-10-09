@@ -24,6 +24,7 @@ final appRouter = GoRouter(
           _AppShell(location: state.uri.path, child: child),
       routes: [
         GoRoute(path: '/', builder: (_, _) => const DashboardScreen()),
+        GoRoute(path: '/scan', builder: (_, _) => const ScannerScreen()),
         GoRoute(
           path: '/expenses',
           builder: (_, _) => const ExpenseHistoryScreen(),
@@ -31,7 +32,6 @@ final appRouter = GoRouter(
         GoRoute(path: '/analytics', builder: (_, _) => const AnalyticsScreen()),
       ],
     ),
-    GoRoute(path: '/scan', builder: (_, _) => const ScannerScreen()),
     GoRoute(
       path: '/review',
       builder: (_, state) => ReviewScreen(
@@ -61,8 +61,9 @@ class _AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final index = switch (location) {
-      '/expenses' => 1,
-      '/analytics' => 2,
+      '/scan' => 1,
+      '/expenses' => 2,
+      '/analytics' => 3,
       _ => 0,
     };
     return Scaffold(
@@ -70,8 +71,9 @@ class _AppShell extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: index,
         onDestinationSelected: (value) => context.go(switch (value) {
-          1 => '/expenses',
-          2 => '/analytics',
+          1 => '/scan',
+          2 => '/expenses',
+          3 => '/analytics',
           _ => '/',
         }),
         destinations: [
@@ -79,6 +81,11 @@ class _AppShell extends StatelessWidget {
             icon: Icon(Icons.space_dashboard_outlined),
             selectedIcon: Icon(Icons.space_dashboard),
             label: context.l10n.home,
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.add_circle_outline),
+            selectedIcon: Icon(Icons.add_circle),
+            label: context.l10n.add,
           ),
           NavigationDestination(
             icon: Icon(Icons.receipt_long_outlined),

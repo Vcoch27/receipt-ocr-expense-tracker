@@ -37,6 +37,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
+  String get overview => 'Overview';
+
+  @override
+  String monthYear(int month, int year) {
+    return '$month/$year';
+  }
+
+  @override
+  String get scanOrImport => 'Scan / import';
+
+  @override
+  String monthIncrease(int percent) {
+    return 'Up $percent% vs last month';
+  }
+
+  @override
+  String monthDecrease(int percent) {
+    return 'Down $percent% vs last month';
+  }
+
+  @override
   String get history => 'History';
 
   @override
@@ -68,6 +89,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get spentThisMonth => 'Spent this month';
 
   @override
+  String get monthlyBudget => 'Monthly budget';
+
+  @override
+  String get setBudget => 'Set budget';
+
+  @override
+  String get editBudget => 'Edit budget';
+
+  @override
+  String get removeBudget => 'Remove budget';
+
+  @override
+  String budgetRemaining(String amount) {
+    return '$amount remaining in budget';
+  }
+
+  @override
+  String budgetExceeded(String amount) {
+    return 'Over budget by $amount';
+  }
+
+  @override
+  String get budgetSaveError => 'Could not save budget. Please try again.';
+
+  @override
   String get firstExpenseHint => 'Your first expense starts below';
 
   @override
@@ -90,6 +136,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chooseSource => 'Choose a source';
+
+  @override
+  String get threeStepFlow => 'THREE SIMPLE STEPS';
+
+  @override
+  String get stepPick => 'Choose';
+
+  @override
+  String get stepReview => 'Review';
+
+  @override
+  String get stepSave => 'Save';
 
   @override
   String get localPrivacyHint =>
@@ -286,6 +344,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get expenseHistory => 'Expense history';
 
   @override
+  String get searchExpenses => 'Search name, amount, or note';
+
+  @override
+  String get thisMonth => 'This month';
+
+  @override
+  String get lastMonth => 'Last month';
+
+  @override
+  String get chooseMonth => 'Choose month';
+
+  @override
+  String get noCurrentWeekExpenses => 'No expenses this week.';
+
+  @override
+  String historySummary(int count) {
+    return '$count expenses';
+  }
+
+  @override
+  String get noMatchingExpenses => 'No matching expenses';
+
+  @override
+  String get adjustFilters => 'Try another search or filter.';
+
+  @override
   String get historyUnavailable => 'History unavailable';
 
   @override
@@ -366,6 +450,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get byCategory => 'By category';
 
   @override
+  String get spendingNote => 'From your data';
+
+  @override
+  String topCategoryInsight(String category, int percent) {
+    return 'Largest category: $category, $percent% of spending in the selected month.';
+  }
+
+  @override
   String get noExpensesThisMonth => 'No expenses this month.';
 
   @override
@@ -385,7 +477,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String categoryChartSemantics(String amount) {
-    return 'This month\'s spending by category, total $amount';
+    return 'Spending by category, total $amount';
   }
 
   @override

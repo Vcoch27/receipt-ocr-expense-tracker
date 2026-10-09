@@ -152,7 +152,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   ),
                 if (suggestion.note != null)
                   Text('${context.l10n.note}: ${suggestion.note}'),
-                if (suggestion.transactionReference != null)
+                if (_isPayment && suggestion.transactionReference != null)
                   Text(
                     '${context.l10n.reference}: ${suggestion.transactionReference}',
                   ),
@@ -317,10 +317,12 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
             child: ListView(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
               children: [
-                Text(
-                  localizedSource(context, _source),
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: theme.colorScheme.primary,
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Chip(
+                    avatar: const Icon(Icons.verified_user_outlined, size: 18),
+                    label: Text(localizedSource(context, _source)),
+                    backgroundColor: theme.colorScheme.secondaryContainer,
                   ),
                 ),
                 const SizedBox(height: 6),
@@ -331,21 +333,49 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   style: theme.textTheme.headlineSmall,
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  context.l10n.reviewHint,
-                  style: theme.textTheme.bodyMedium,
+                const SizedBox(height: 14),
+                Card(
+                  color: theme.colorScheme.tertiaryContainer.withValues(
+                    alpha: .55,
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          color: theme.colorScheme.onTertiaryContainer,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            context.l10n.reviewHint,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
                 if (image != null) ...[
-                  const SizedBox(height: 20),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.file(
-                      File(image),
-                      height: 180,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, _, _) => ListTile(
-                        leading: const Icon(Icons.broken_image_outlined),
-                        title: Text(context.l10n.imagePreviewUnavailable),
+                  const SizedBox(height: 16),
+                  Card(
+                    color: theme.colorScheme.surfaceContainerLow,
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(14),
+                        child: Image.file(
+                          File(image),
+                          height: 220,
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, _, _) => ListTile(
+                            leading: const Icon(Icons.broken_image_outlined),
+                            title: Text(context.l10n.imagePreviewUnavailable),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -398,6 +428,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => _amountFocus.requestFocus(),
                   decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.storefront_outlined),
                     labelText: _isPayment
                         ? context.l10n.recipientOrMerchant
                         : context.l10n.merchant,
@@ -417,6 +448,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   keyboardType: TextInputType.number,
                   textInputAction: TextInputAction.next,
                   decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.payments_outlined),
                     labelText: context.l10n.amountVnd,
                     hintText: '150.000',
                     helperText: context.l10n.amountHint,
@@ -432,6 +464,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
                   controller: _date,
                   keyboardType: TextInputType.datetime,
                   decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.event_outlined),
                     labelText: context.l10n.transactionDate,
                     hintText: 'dd/MM/yyyy',
                     suffixIcon: IconButton(

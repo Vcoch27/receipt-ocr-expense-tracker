@@ -10,6 +10,7 @@ import '../l10n/l10n.dart';
 import '../routing/app_router.dart';
 import '../state/expense_providers.dart';
 import '../widgets/page_container.dart';
+import '../widgets/app_header.dart';
 
 class ScannerScreen extends ConsumerStatefulWidget {
   const ScannerScreen({super.key});
@@ -52,22 +53,53 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
     final service = ref.read(receiptScanServiceProvider);
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text(context.l10n.addExpense)),
+      appBar: AppHeader(subtitle: context.l10n.addExpense),
       body: SafeArea(
         child: PageContainer(
           child: ListView(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             children: [
+              Text(
+                context.l10n.threeStepFlow,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.secondary,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
               Text(
                 context.l10n.chooseSource,
                 style: theme.textTheme.headlineSmall,
               ),
               const SizedBox(height: 8),
               Text(
-                context.l10n.localPrivacyHint,
+                context.l10n.captureSubtitle,
                 style: theme.textTheme.bodyMedium,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
+              Card(
+                color: theme.colorScheme.surfaceContainerLow,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 16,
+                  ),
+                  child: Row(
+                    children: [
+                      _FlowStep(
+                        number: '1',
+                        label: context.l10n.stepPick,
+                        selected: true,
+                      ),
+                      const Expanded(child: Divider()),
+                      _FlowStep(number: '2', label: context.l10n.stepReview),
+                      const Expanded(child: Divider()),
+                      _FlowStep(number: '3', label: context.l10n.stepSave),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
               _SourceCard(
                 icon: Icons.phone_android_outlined,
                 title: context.l10n.importPaymentScreenshot,
@@ -129,6 +161,28 @@ class _ScannerScreenState extends ConsumerState<ScannerScreen> {
                   ),
                 ),
               ],
+              const SizedBox(height: 18),
+              Card(
+                color: theme.colorScheme.surfaceContainerLow,
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.lock_outline,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          context.l10n.localPrivacyHint,
+                          style: theme.textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -155,15 +209,21 @@ class _SourceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Card(
-      color: prominent ? scheme.primaryContainer : null,
+      color: prominent ? scheme.primaryContainer.withValues(alpha: .55) : null,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 23),
           child: Row(
             children: [
-              Icon(icon, size: 30, color: scheme.primary),
+              CircleAvatar(
+                radius: 25,
+                backgroundColor: prominent
+                    ? scheme.secondaryContainer
+                    : scheme.surfaceContainerHigh,
+                child: Icon(icon, size: 27, color: scheme.primary),
+              ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -178,11 +238,45 @@ class _SourceCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right),
+              Icon(Icons.arrow_forward_rounded, color: scheme.primary),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _FlowStep extends StatelessWidget {
+  const _FlowStep({
+    required this.number,
+    required this.label,
+    this.selected = false,
+  });
+  final String number;
+  final String label;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 17,
+          backgroundColor: selected
+              ? scheme.primary
+              : scheme.surfaceContainerHigh,
+          child: Text(
+            number,
+            style: TextStyle(
+              color: selected ? scheme.onPrimary : scheme.onSurfaceVariant,
+            ),
+          ),
+        ),
+        const SizedBox(height: 5),
+        Text(label, style: Theme.of(context).textTheme.labelSmall),
+      ],
     );
   }
 }

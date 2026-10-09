@@ -14,8 +14,14 @@ import '../services/receipt_parser.dart';
 import '../services/receipt_scan_service.dart';
 
 final expenseRepositoryProvider = Provider<ExpenseRepository>(
-  (ref) => ExpenseDatabase(),
+  (ref) => ExpenseDatabase(enableAutoSeed: true),
 );
+final monthlyBudgetProvider = FutureProvider.family<int?, int>((ref, monthKey) {
+  final repository = ref.read(expenseRepositoryProvider);
+  return repository is BudgetRepository
+      ? (repository as BudgetRepository).budgetForMonth(monthKey)
+      : Future<int?>.value();
+});
 final imageStoreProvider = Provider<ReceiptImageStore>(
   (ref) => ReceiptImageStore(),
 );
@@ -49,6 +55,18 @@ final expensesProvider =
 final expenseAnalyticsProvider = Provider<AsyncValue<ExpenseAnalytics>>(
   (ref) => ref.watch(expensesProvider).whenData(ExpenseAnalytics.fromItems),
 );
+
+final expenseMonthAnalyticsProvider =
+    Provider.family<AsyncValue<ExpenseAnalytics>, int>((ref, monthKey) {
+      final year = (monthKey - 1) ~/ 12;
+      final month = monthKey - year * 12;
+      return ref
+          .watch(expensesProvider)
+          .whenData(
+            (items) =>
+                ExpenseAnalytics.fromItems(items, month: DateTime(year, month)),
+          );
+    });
 
 class ExpensesNotifier extends AsyncNotifier<List<ExpenseItem>> {
   @override

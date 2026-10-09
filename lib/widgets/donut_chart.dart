@@ -7,8 +7,9 @@ import '../core/formatters.dart';
 import '../l10n/l10n.dart';
 
 class DonutChart extends StatefulWidget {
-  const DonutChart({super.key, required this.values});
+  const DonutChart({super.key, required this.values, this.periodLabel});
   final Map<String, int> values;
+  final String? periodLabel;
 
   @override
   State<DonutChart> createState() => _DonutChartState();
@@ -74,7 +75,7 @@ class _DonutChartState extends State<DonutChart>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  context.l10n.allSpending,
+                  widget.periodLabel ?? context.l10n.allSpending,
                   style: Theme.of(context).textTheme.labelMedium,
                 ),
                 const SizedBox(height: 4),

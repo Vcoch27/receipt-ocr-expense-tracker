@@ -36,7 +36,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Ghi lại từng khoản chi'), findsOneWidget);
+    expect(find.text('ĐÃ CHI TRONG THÁNG'), findsOneWidget);
     expect(find.text('Lịch sử'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
@@ -45,7 +45,7 @@ void main() {
     expect(tester.takeException(), isNull);
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
-    expect(find.text('Capture what you spend'), findsOneWidget);
+    expect(find.text('SPENT THIS MONTH'), findsOneWidget);
     expect(find.text('History'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

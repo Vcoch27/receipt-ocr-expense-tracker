@@ -16,8 +16,10 @@ class ExpenseAnalytics {
   factory ExpenseAnalytics.fromItems(
     Iterable<ExpenseItem> items, {
     DateTime? now,
+    DateTime? month,
   }) {
     final today = now ?? DateTime.now();
+    final targetMonth = month ?? today;
     final start = DateTime(
       today.year,
       today.month,
@@ -29,7 +31,8 @@ class ExpenseAnalytics {
     for (final item in items) {
       // Match the dashboard's calendar-month summary. Both views use the
       // verified transaction date, never the row's creation timestamp.
-      if (item.date.year == today.year && item.date.month == today.month) {
+      if (item.date.year == targetMonth.year &&
+          item.date.month == targetMonth.month) {
         total += item.amount;
         categories.update(
           item.category,

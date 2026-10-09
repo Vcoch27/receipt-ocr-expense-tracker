@@ -1,6 +1,7 @@
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import 'demo_data_seeder.dart';
 import '../models/expense_item.dart';
 
 abstract class ExpenseRepository {
@@ -10,12 +11,21 @@ abstract class ExpenseRepository {
   Future<void> delete(int id);
 }
 
-class ExpenseDatabase implements ExpenseRepository {
-  ExpenseDatabase({DatabaseFactory? factory, this._databasePath})
-    : _factory = factory ?? databaseFactory;
+abstract class BudgetRepository {
+  Future<int?> budgetForMonth(int monthKey);
+  Future<void> setBudgetForMonth(int monthKey, int? amount);
+}
+
+class ExpenseDatabase implements ExpenseRepository, BudgetRepository {
+  ExpenseDatabase({
+    DatabaseFactory? factory,
+    this._databasePath,
+    this.enableAutoSeed = false,
+  }) : _factory = factory ?? databaseFactory;
 
   final DatabaseFactory _factory;
   final String? _databasePath;
+  final bool enableAutoSeed;
   Future<Database>? _opening;
 
   Future<Database> get _database async {
@@ -27,13 +37,20 @@ class ExpenseDatabase implements ExpenseRepository {
     }
   }
 
+  Future<void> close() async {
+    if (_opening != null) {
+      await (await _opening!).close();
+      _opening = null;
+    }
+  }
+
   Future<Database> _open() async {
     final path =
         _databasePath ?? p.join(await getDatabasesPath(), 'expenses.db');
-    return _factory.openDatabase(
+    final db = await _factory.openDatabase(
       path,
       options: OpenDatabaseOptions(
-        version: 2,
+        version: 3,
         onCreate: (db, _) async {
           await db.execute('''
             CREATE TABLE expenses (
@@ -56,6 +73,12 @@ class ExpenseDatabase implements ExpenseRepository {
           await db.execute(
             'CREATE INDEX expenses_by_date ON expenses(date DESC)',
           );
+          await db.execute('''
+            CREATE TABLE monthly_budgets (
+              month_key INTEGER PRIMARY KEY,
+              amount INTEGER NOT NULL CHECK(amount > 0)
+            )
+          ''');
         },
         onUpgrade: (db, oldVersion, _) async {
           if (oldVersion < 2) {
@@ -71,9 +94,21 @@ class ExpenseDatabase implements ExpenseRepository {
             );
             await db.execute('ALTER TABLE expenses ADD COLUMN note TEXT');
           }
+          if (oldVersion < 3) {
+            await db.execute('''
+              CREATE TABLE monthly_budgets (
+                month_key INTEGER PRIMARY KEY,
+                amount INTEGER NOT NULL CHECK(amount > 0)
+              )
+            ''');
+          }
         },
       ),
     );
+    if (enableAutoSeed) {
+      await DemoDataSeeder.seedIfEmpty(db);
+    }
+    return db;
   }
 
   @override
@@ -112,5 +147,45 @@ class ExpenseDatabase implements ExpenseRepository {
       whereArgs: [id],
     );
     if (count != 1) throw StateError('Expense $id was not found');
+  }
+
+  @override
+  Future<int?> budgetForMonth(int monthKey) async {
+    final rows = await (await _database).query(
+      'monthly_budgets',
+      columns: ['amount'],
+      where: 'month_key = ?',
+      whereArgs: [monthKey],
+    );
+    return rows.isEmpty ? null : rows.single['amount'] as int;
+  }
+
+  @override
+  Future<void> setBudgetForMonth(int monthKey, int? amount) async {
+    final db = await _database;
+    if (amount == null) {
+      await db.delete(
+        'monthly_budgets',
+        where: 'month_key = ?',
+        whereArgs: [monthKey],
+      );
+    } else {
+      if (amount <= 0) throw ArgumentError.value(amount, 'amount');
+      await db.insert('monthly_budgets', {
+        'month_key': monthKey,
+        'amount': amount,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+  }
+
+  Future<void> seedDemoData({bool clearFirst = true}) async {
+    final db = await _database;
+    await DemoDataSeeder.seed(db, clearFirst: clearFirst);
+  }
+
+  Future<void> clearAll() async {
+    final db = await _database;
+    await db.delete('expenses');
+    await db.delete('monthly_budgets');
   }
 }
