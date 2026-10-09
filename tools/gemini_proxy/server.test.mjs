@@ -6,8 +6,9 @@ import test from 'node:test';
 process.env.GEMINI_API_KEY = 'test-only-key';
 process.env.PORT = '0';
 let upstreamCalls = 0;
-globalThis.fetch = async (_url, options) => {
+globalThis.fetch = async (url, options) => {
   upstreamCalls++;
+  assert.match(url, /models\/gemini-3\.1-flash-lite:generateContent$/);
   assert.equal(options.headers['x-goog-api-key'], 'test-only-key');
   return {
     ok: true,

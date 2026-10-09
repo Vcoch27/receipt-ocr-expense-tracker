@@ -8,7 +8,7 @@ if (!key) {
 
 const host = process.env.HOST ?? '127.0.0.1';
 const port = Number(process.env.PORT ?? 8787);
-const model = 'gemini-2.5-flash-lite';
+const model = 'gemini-3.1-flash-lite';
 
 function respond(res, status, data) {
   res.writeHead(status, { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' });
@@ -90,6 +90,9 @@ export const server = createServer(async (req, res) => {
       clearTimeout(timeout);
     }
     if (!upstream.ok) {
+      const errorBody = await upstream.json().catch(() => null);
+      console.error('Gemini upstream error:', upstream.status,
+        String(errorBody?.error?.message ?? '').slice(0, 500));
       respond(res, 502, { error: 'Gemini request failed', upstreamStatus: upstream.status });
       return;
     }
