@@ -121,7 +121,7 @@ stable keys, so switching languages does not rewrite expense records.
 
 ### Optional Gemini second opinion
 
-Gemini 2.5 Flash-Lite can suggest merchant/recipient, VND amount, date,
+Gemini 3.1 Flash-Lite can suggest merchant/recipient, VND amount, date,
 transfer note and reference when the local result is uncertain. The user
 starts this action from Review, consents to sending the image and OCR text,
 inspects the suggested values, chooses whether to apply them, and then

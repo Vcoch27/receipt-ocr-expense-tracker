@@ -10,4 +10,6 @@ The app still performs required ML Kit OCR and heuristic parsing on device. Gemi
 
 The proxy listens on loopback only. A physical device reaches it through ADB reverse while connected by USB. The Flutter button is hidden if `AI_PROXY_URL` is absent. No Gemini request occurs during ordinary OCR or while viewing an expense.
 
+The proxy uses `gemini-3.1-flash-lite`. Google limits Gemini 2.5 model access for some newer projects, which can otherwise produce a 404 even when the API key is valid.
+
 For a deployed build, use an HTTPS proxy with server-side secret storage, authentication, per-user quotas and rate limiting before exposing it to the Internet. Do not publicly deploy this local development server. Configure the app's `AI_PROXY_URL` to the authenticated proxy URL. The free Gemini API tier has quotas and may use submitted data under different terms from paid usage; read Google's current pricing and terms before sending sensitive receipts or bank screenshots.
