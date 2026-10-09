@@ -9,6 +9,7 @@ The app still performs required ML Kit OCR and heuristic parsing on device. Gemi
 3. In another terminal, run `adb reverse tcp:8787 tcp:8787` and `flutter run -d R9JN409P9RJ --dart-define=AI_PROXY_URL=http://127.0.0.1:8787/analyze`.
 
 The proxy listens on loopback only. A physical device reaches it through ADB reverse while connected by USB. The Flutter button is hidden if `AI_PROXY_URL` is absent. No Gemini request occurs during ordinary OCR or while viewing an expense.
+Run `adb reverse tcp:8787 tcp:8787` again whenever USB or ADB reconnects; the reverse mapping is temporary. JPEG, PNG, and WebP images are accepted.
 
 The proxy uses `gemini-3.1-flash-lite`. Google limits Gemini 2.5 model access for some newer projects, which can otherwise produce a 404 even when the API key is valid.
 

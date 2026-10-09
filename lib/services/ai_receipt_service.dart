@@ -71,12 +71,6 @@ class ProxyAiReceiptService implements AiReceiptService {
     if (!isAvailable || draft.imagePath == null) {
       throw const AiReceiptException('AI reader is unavailable');
     }
-    final lowerPath = draft.imagePath!.toLowerCase();
-    if (!lowerPath.endsWith('.jpg') &&
-        !lowerPath.endsWith('.jpeg') &&
-        !lowerPath.endsWith('.png')) {
-      throw const AiReceiptException('Unsupported image format');
-    }
     final uri = Uri.parse(endpoint);
     if (uri.scheme != 'https' &&
         !(uri.scheme == 'http' &&
@@ -88,7 +82,32 @@ class ProxyAiReceiptService implements AiReceiptService {
     if (bytes.isEmpty || bytes.length > 6 * 1024 * 1024) {
       throw const AiReceiptException('Image is empty or too large');
     }
-    final mimeType = lowerPath.endsWith('.png') ? 'image/png' : 'image/jpeg';
+    // Android's picker can give JPEG bytes a .webp cache filename. Identify
+    // the encoded image itself so the proxy receives a matching MIME type.
+    final mimeType =
+        bytes.length >= 3 &&
+            bytes[0] == 0xff &&
+            bytes[1] == 0xd8 &&
+            bytes[2] == 0xff
+        ? 'image/jpeg'
+        : bytes.length >= 8 &&
+              bytes[0] == 0x89 &&
+              bytes[1] == 0x50 &&
+              bytes[2] == 0x4e &&
+              bytes[3] == 0x47 &&
+              bytes[4] == 0x0d &&
+              bytes[5] == 0x0a &&
+              bytes[6] == 0x1a &&
+              bytes[7] == 0x0a
+        ? 'image/png'
+        : bytes.length >= 12 &&
+              String.fromCharCodes(bytes.sublist(0, 4)) == 'RIFF' &&
+              String.fromCharCodes(bytes.sublist(8, 12)) == 'WEBP'
+        ? 'image/webp'
+        : null;
+    if (mimeType == null) {
+      throw const AiReceiptException('Unsupported image format');
+    }
     final client = HttpClient()
       ..connectionTimeout = const Duration(seconds: 10);
     try {

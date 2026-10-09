@@ -58,4 +58,14 @@ test('forwards a valid image and returns validated fields', async () => {
   assert.equal(upstreamCalls, 1);
 });
 
+test('accepts WebP images from Android gallery picker', async () => {
+  const image = Buffer.from([82, 73, 70, 70, 4, 0, 0, 0, 87, 69, 66, 80]);
+  const result = await post({
+    source: 'receipt', imageBase64: image.toString('base64'),
+    mimeType: 'image/webp', rawText: '',
+  });
+  assert.equal(result.status, 200);
+  assert.equal(upstreamCalls, 2);
+});
+
 test.after(() => server.close());

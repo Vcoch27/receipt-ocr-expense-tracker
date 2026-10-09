@@ -179,7 +179,7 @@ class AppLocalizationsVi extends AppLocalizations {
 
   @override
   String get aiReadError =>
-      'AI không đọc được. Kiểm tra kết nối máy chủ hoặc tiếp tục nhập thủ công.';
+      'AI không đọc được ảnh này. Kiểm tra định dạng, kích thước ảnh và kết nối máy chủ, hoặc nhập thủ công.';
 
   @override
   String get imagePreviewUnavailable => 'Không xem trước được ảnh';

@@ -58,11 +58,15 @@ export const server = createServer(async (req, res) => {
       && imageBytes[0] === 0xff && imageBytes[1] === 0xd8 && imageBytes[2] === 0xff;
     const isPng = imageBytes.length >= 8
       && imageBytes.subarray(0, 8).equals(Buffer.from('89504e470d0a1a0a', 'hex'));
-    if (!['image/jpeg', 'image/png'].includes(input.mimeType)
+    const isWebp = imageBytes.length >= 12
+      && imageBytes.toString('ascii', 0, 4) === 'RIFF'
+      && imageBytes.toString('ascii', 8, 12) === 'WEBP';
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(input.mimeType)
         || typeof input.imageBase64 !== 'string'
         || !/^[A-Za-z0-9+/]+={0,2}$/.test(input.imageBase64)
         || imageBytes.length > 6 * 1024 * 1024
-        || !(input.mimeType === 'image/jpeg' ? isJpeg : isPng)
+        || !(input.mimeType === 'image/jpeg' ? isJpeg
+          : input.mimeType === 'image/png' ? isPng : isWebp)
         || typeof input.rawText !== 'string'
         || input.rawText.length > 12000
         || !['receipt', 'bankScreenshot', 'eWalletScreenshot'].includes(input.source)) {

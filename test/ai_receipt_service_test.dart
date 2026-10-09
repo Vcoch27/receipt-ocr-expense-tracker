@@ -30,10 +30,11 @@ void main() {
     expect(result.isEmpty, isTrue);
   });
 
-  test('sends selected image to local proxy only when requested', () async {
+  test('sends a picked WebP image to the local proxy', () async {
     final directory = await Directory.systemTemp.createTemp('ai-receipt-test');
-    final image = File('${directory.path}/receipt.png');
-    await image.writeAsBytes([137, 80, 78, 71]);
+    final image = File('${directory.path}/receipt.webp');
+    const imageBytes = [82, 73, 70, 70, 4, 0, 0, 0, 87, 69, 66, 80];
+    await image.writeAsBytes(imageBytes);
     final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     addTearDown(() async {
       await server.close(force: true);
@@ -43,10 +44,10 @@ void main() {
       final body = jsonDecode(
         await utf8.decoder.bind(request).join(),
       ) as Map<String, dynamic>;
-      expect(body['mimeType'], 'image/png');
+      expect(body['mimeType'], 'image/webp');
       expect(body['rawText'], 'Tổng tiền 150.000');
       expect(body['source'], 'receipt');
-      expect(base64Decode(body['imageBase64'] as String), [137, 80, 78, 71]);
+      expect(base64Decode(body['imageBase64'] as String), imageBytes);
       request.response.headers.contentType = ContentType.json;
       request.response.write(
         jsonEncode({
@@ -70,5 +71,37 @@ void main() {
     await requestHandled;
     expect(suggestion.amount, 150000);
     expect(suggestion.merchant, 'Test Shop');
+  });
+
+  test('uses JPEG MIME for JPEG bytes in a .webp picker cache file', () async {
+    final directory = await Directory.systemTemp.createTemp('ai-picker-test');
+    final image = File('${directory.path}/scaled_receipt.webp');
+    await image.writeAsBytes([0xff, 0xd8, 0xff, 0xe1, 0, 0]);
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() async {
+      await server.close(force: true);
+      await directory.delete(recursive: true);
+    });
+    final requestHandled = server.first.then((request) async {
+      final body = jsonDecode(
+        await utf8.decoder.bind(request).join(),
+      ) as Map<String, dynamic>;
+      expect(body['mimeType'], 'image/jpeg');
+      request.response.headers.contentType = ContentType.json;
+      request.response.write(jsonEncode({'merchant': 'Test Shop'}));
+      await request.response.close();
+    });
+    final service = ProxyAiReceiptService(
+      'http://127.0.0.1:${server.port}/analyze',
+    );
+    final result = await service.suggest(
+      ParsedExpense(
+        source: ExpenseSource.receipt,
+        rawText: '',
+        imagePath: image.path,
+      ),
+    );
+    await requestHandled;
+    expect(result.merchant, 'Test Shop');
   });
 }
