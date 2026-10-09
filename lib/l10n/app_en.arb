@@ -53,7 +53,7 @@
   "aiSuggestionHint": "AI can make mistakes. Apply these suggestions only after comparing them with the image. You can edit every field afterward.",
   "aiApplySuggestion": "Apply suggestions",
   "aiNoSuggestion": "AI could not confidently identify any fields. Enter them manually.",
-  "aiReadError": "AI reading failed. Check the proxy connection or continue manually.",
+  "aiReadError": "AI could not read this image. Check the image format, size, and proxy connection, or continue manually.",
   "imagePreviewUnavailable": "Image preview unavailable",
   "noOcrText": "No text was recognized. Enter the details from the image manually.",
   "recipientOrMerchant": "Recipient or merchant",

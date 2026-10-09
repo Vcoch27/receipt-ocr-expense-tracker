@@ -53,7 +53,7 @@
   "aiSuggestionHint": "AI có thể đọc sai. Chỉ áp dụng sau khi đối chiếu với ảnh. Bạn vẫn có thể sửa từng trường.",
   "aiApplySuggestion": "Áp dụng gợi ý",
   "aiNoSuggestion": "AI không xác định chắc chắn trường nào. Hãy nhập thủ công.",
-  "aiReadError": "AI không đọc được. Kiểm tra kết nối máy chủ hoặc tiếp tục nhập thủ công.",
+  "aiReadError": "AI không đọc được ảnh này. Kiểm tra định dạng, kích thước ảnh và kết nối máy chủ, hoặc nhập thủ công.",
   "imagePreviewUnavailable": "Không xem trước được ảnh",
   "noOcrText": "Không nhận dạng được chữ. Hãy nhập thông tin từ ảnh thủ công.",
   "recipientOrMerchant": "Người nhận hoặc cửa hàng",

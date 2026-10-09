@@ -413,7 +413,7 @@ abstract class AppLocalizations {
   /// No description provided for @aiReadError.
   ///
   /// In en, this message translates to:
-  /// **'AI reading failed. Check the proxy connection or continue manually.'**
+  /// **'AI could not read this image. Check the image format, size, and proxy connection, or continue manually.'**
   String get aiReadError;
 
   /// No description provided for @imagePreviewUnavailable.

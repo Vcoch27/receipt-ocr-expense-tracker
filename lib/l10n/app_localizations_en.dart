@@ -180,7 +180,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiReadError =>
-      'AI reading failed. Check the proxy connection or continue manually.';
+      'AI could not read this image. Check the image format, size, and proxy connection, or continue manually.';
 
   @override
   String get imagePreviewUnavailable => 'Image preview unavailable';
